@@ -59,7 +59,6 @@
     <div>
       <!-- Phase 1 -->
       <section id="phase1">
-        <div class="kicker">Week 1</div>
         <h2>Phase 1 — Foundations</h2>
         <span class="tag">Benchmarks</span>
         <span class="tag">UI datasets</span>
@@ -98,7 +97,6 @@
 
       <!-- Phase 2 -->
       <section id="phase2">
-        <div class="kicker">Weeks 2–3</div>
         <h2>Phase 2 — Modern UI Perception</h2>
         <span class="tag">Grounding</span>
         <span class="tag">Multitask pretraining</span>
@@ -126,7 +124,6 @@
 
       <!-- Phase 3 -->
       <section id="phase3">
-        <div class="kicker">Weeks 4–5</div>
         <h2>Phase 3 — Perception → Action</h2>
         <span class="tag">Behavior cloning</span>
         <span class="tag">Action schemas</span>
@@ -154,7 +151,6 @@
 
       <!-- Phase 4 -->
       <section id="phase4">
-        <div class="kicker">Weeks 6–7</div>
         <h2>Phase 4 — RL & Preference Optimization</h2>
         <span class="tag">RLHF</span>
         <span class="tag">PPO</span>
@@ -182,7 +178,6 @@
 
       <!-- Phase 5 -->
       <section id="phase5">
-        <div class="kicker">Weeks 8+</div>
         <h2>Phase 5 — Toward General Computer Use</h2>
         <span class="tag">VM benchmarks</span>
         <span class="tag">End‑to‑end agents</span>
@@ -229,5 +224,57 @@
       <div class="foot">Built for fast skimming. If a link breaks or you want a PDF mirror, ping me and I’ll swap it in.</div>
     </div>
   </main>
+  <script>
+    (function(){
+      function slugify(text){
+        return (text||'')
+          .toLowerCase()
+          .replace(/\(.*?\)/g,'')
+          .replace(/[^a-z0-9\s-]/g,'')
+          .trim()
+          .replace(/\s+/g,'-')
+          .replace(/-+/g,'-');
+      }
+      const cards = document.querySelectorAll('#phase1 .card, #phase2 .card, #phase3 .card, #phase4 .card, #phase5 .card');
+      cards.forEach(card => {
+        const titleEl = card.querySelector('strong');
+        if(!titleEl) return;
+        const slug = slugify(titleEl.textContent);
+        const href = `papers/${slug}.html`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = 'Checking…';
+        card.appendChild(badge);
+
+        // Mark the container as clickable (we'll disable if missing)
+        card.classList.add('clickable');
+        card.addEventListener('click', (e)=>{
+          // Allow inner links (e.g., arXiv) to behave normally
+          if(e.target.closest('a')) return;
+          if(card.dataset.exists === 'true') {
+            window.location.href = href;
+          } else {
+            badge.textContent = "Not read yet";
+          }
+        });
+
+        // Probe for existence of the notes page
+        fetch(href, { method: 'HEAD' })
+          .then(r => {
+            if(r.ok){
+              card.dataset.exists = 'true';
+              badge.textContent = 'Notes available';
+            } else {
+              card.dataset.exists = 'false';
+              badge.textContent = 'Not read yet';
+            }
+          })
+          .catch(() => {
+            card.dataset.exists = 'false';
+            badge.textContent = 'Not read yet';
+          });
+      });
+    })();
+  </script>
 </body>
 </html>

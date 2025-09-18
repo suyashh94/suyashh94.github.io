@@ -1,7 +1,14 @@
 /* Global modern dark theme */
 :root{
-  --bg:#0f1115; --panel:#161a22; --panel2:#1c2230; --text:#e8eef7; --muted:#9fb0c9; --acc:#64b5ff; --acc2:#7ef0c4;
-  --border:#253046;
+  /* Slightly lighter, still dark */
+  --bg:#141821;      /* page background */
+  --panel:#1b2331;   /* cards/panels */
+  --panel2:#222c3d;  /* inset panels */
+  --text:#eef3f9;    /* main text */
+  --muted:#a9b7cf;   /* secondary text */
+  --acc:#5aa8ff;     /* primary accent */
+  --acc2:#7ee8c4;    /* success/doing accent */
+  --border:#2d3a52;  /* borders */
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -41,6 +48,8 @@ h1,h2{margin:0 0 10px}
 
 /* Card grid helpers (optional for pages) */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:8px}
-.card{background:linear-gradient(180deg,var(--panel2),#161b27);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.card{background:linear-gradient(180deg,var(--panel2),#1a2230);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;transition:transform .06s ease, border-color .15s ease}
+.card.clickable{cursor:pointer}
+.card:hover{border-color:#3a4c6d;transform:translateY(-1px)}
+.badge{display:inline-block;font-size:11px;color:var(--muted);background:#0f1420;border:1px solid var(--border);border-radius:999px;padding:2px 8px;margin-top:4px;width:max-content}
 .foot{color:var(--muted);font-size:12px;text-align:center;margin:22px 0}
-
