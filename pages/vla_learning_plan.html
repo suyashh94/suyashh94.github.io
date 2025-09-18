@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vision–Language–Action (VLA) — Research Learning Workflow</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#161a22; --panel2:#1c2230; --text:#e8eef7; --muted:#9fb0c9; --acc:#64b5ff; --acc2:#7ef0c4;
+      --border: #253046;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#0d1016);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(15,17,21,.85);backdrop-filter:saturate(150%) blur(10px);border-bottom:1px solid var(--border)}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    h1{font-size:clamp(20px,3vw,32px);margin:8px 0 6px}
+    .sub{color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:18px}
+    nav{position:sticky;top:74px;align-self:start;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
+    nav h3{margin:0 0 10px;font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+    nav a{display:block;padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px;border:1px solid transparent}
+    nav a:hover{background:var(--panel2);border-color:var(--border)}
+    section{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+    h2{margin:0 0 10px;font-size:20px}
+    .tag{display:inline-block;border:1px solid var(--border);background:var(--panel2);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--muted);margin:2px 6px 8px 0}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:8px}
+    .card{background:linear-gradient(180deg,var(--panel2),#161b27);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+    .card a{color:var(--acc);text-decoration:none}
+    .card a:hover{text-decoration:underline}
+    .meta{color:var(--muted);font-size:12px}
+    .do{border-left:3px solid var(--acc2);padding-left:10px;margin-top:6px}
+    .kicker{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+    .foot{color:var(--muted);font-size:12px;text-align:center;margin:22px 0}
+    code{background:#0b0e13;border:1px solid var(--border);padding:2px 5px;border-radius:6px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Vision–Language–Action (VLA): Research Learning Workflow</h1>
+      <div class="sub">A phased syllabus with verified papers, datasets, and hands‑on tasks for UI‑acting agents</div>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <nav>
+      <h3>On this page</h3>
+      <a href="#phase1">Phase 1 — Foundations</a>
+      <a href="#phase2">Phase 2 — UI Perception</a>
+      <a href="#phase3">Phase 3 — Perception → Action</a>
+      <a href="#phase4">Phase 4 — RL & Preferences</a>
+      <a href="#phase5">Phase 5 — General Computer Use</a>
+      <a href="#hf">Hugging Face Resources</a>
+    </nav>
+
+    <div>
+      <!-- Phase 1 -->
+      <section id="phase1">
+        <div class="kicker">Week 1</div>
+        <h2>Phase 1 — Foundations</h2>
+        <span class="tag">Benchmarks</span>
+        <span class="tag">UI datasets</span>
+        <span class="tag">RLHF template</span>
+        <div class="cards">
+          <div class="card">
+            <strong>World of Bits / MiniWoB (ICML 2017)</strong>
+            <div class="meta">Benchmark for web‑based agents with low‑level actions</div>
+            <a href="https://proceedings.mlr.press/v70/shi17a.html" target="_blank" rel="noopener">PMLR paper</a>
+          </div>
+          <div class="card">
+            <strong>Workflow‑Guided Exploration (ICLR 2018)</strong>
+            <div class="meta">DOM‑aware RL on real websites</div>
+            <a href="https://arxiv.org/abs/1802.08927" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>Rico: A Mobile App Dataset (UIST 2017)</strong>
+            <div class="meta">72k Android UI screens + view hierarchies</div>
+            <a href="https://dl.acm.org/doi/10.1145/3126594.3126651" target="_blank" rel="noopener">ACM DOI</a>
+          </div>
+          <div class="card">
+            <strong>Screen2Words (2021)</strong>
+            <div class="meta">Automatic mobile UI summarization (captioning)</div>
+            <a href="https://arxiv.org/abs/2108.03353" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>WebGPT (OpenAI, 2021)</strong>
+            <div class="meta">Browser‑assisted QA with RLHF (reward model + PPO)</div>
+            <a href="https://arxiv.org/abs/2112.09332" target="_blank" rel="noopener">arXiv</a>
+          </div>
+        </div>
+        <div class="do">
+          <strong>Doing:</strong> Install <a href="https://github.com/Farama-Foundation/miniwob-plusplus" target="_blank" rel="noopener">MiniWoB++</a>. Train a simple behaviour‑cloning baseline: <code>(screenshot, instruction) → action</code>. Load <a href="https://huggingface.co/datasets/rico" target="_blank" rel="noopener">Rico</a> in <code>datasets</code> and explore screen semantics.
+        </div>
+      </section>
+
+      <!-- Phase 2 -->
+      <section id="phase2">
+        <div class="kicker">Weeks 2–3</div>
+        <h2>Phase 2 — Modern UI Perception</h2>
+        <span class="tag">Grounding</span>
+        <span class="tag">Multitask pretraining</span>
+        <div class="cards">
+          <div class="card">
+            <strong>Spotlight (Google, 2023)</strong>
+            <div class="meta">Vision‑language pretraining on millions of screens</div>
+            <a href="https://arxiv.org/abs/2309.03852" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>SeeClick (ACL 2024)</strong>
+            <div class="meta">GUI grounding + ScreenSpot benchmark</div>
+            <a href="https://arxiv.org/abs/2402.09548" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>ScreenAgent (IJCAI 2024)</strong>
+            <div class="meta">VLM‑driven screenshot‑to‑action desktop agent</div>
+            <a href="https://arxiv.org/abs/2405.08928" target="_blank" rel="noopener">arXiv</a>
+          </div>
+        </div>
+        <div class="do">
+          <strong>Doing:</strong> Use <a href="https://huggingface.co/Salesforce/blip2" target="_blank" rel="noopener">BLIP‑2</a> / <a href="https://huggingface.co/models?search=vit" target="_blank" rel="noopener">ViT</a> encoders. Train a grounding model on <a href="https://huggingface.co/datasets/OSU-NLP/Mind2Web" target="_blank" rel="noopener">Mind2Web</a> or samples formatted like ScreenSpot (instruction → target element/region).
+        </div>
+      </section>
+
+      <!-- Phase 3 -->
+      <section id="phase3">
+        <div class="kicker">Weeks 4–5</div>
+        <h2>Phase 3 — Perception → Action</h2>
+        <span class="tag">Behavior cloning</span>
+        <span class="tag">Action schemas</span>
+        <div class="cards">
+          <div class="card">
+            <strong>Mind2Web (NeurIPS 2023 D&B)</strong>
+            <div class="meta">Generalist dataset of real‑site tasks & trajectories</div>
+            <a href="https://arxiv.org/abs/2306.06070" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>AppAgent (2023)</strong>
+            <div class="meta">Multimodal agents for smartphone apps</div>
+            <a href="https://arxiv.org/abs/2308.10023" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>MobileVLM & Mobile‑3M (2024)</strong>
+            <div class="meta">Scaling mobile UI pretraining/agents</div>
+            <a href="https://arxiv.org/abs/2402.18026" target="_blank" rel="noopener">arXiv</a>
+          </div>
+        </div>
+        <div class="do">
+          <strong>Doing:</strong> Behaviour‑clone a policy on Mind2Web: <code>(screenshot + instruction) → action JSON</code>. Try few‑shot baselines with <a href="https://huggingface.co/liuhaotian/LLaVA-13b-delta-v0" target="_blank" rel="noopener">LLaVA‑1.5</a> and compare.
+        </div>
+      </section>
+
+      <!-- Phase 4 -->
+      <section id="phase4">
+        <div class="kicker">Weeks 6–7</div>
+        <h2>Phase 4 — RL & Preference Optimization</h2>
+        <span class="tag">RLHF</span>
+        <span class="tag">PPO</span>
+        <div class="cards">
+          <div class="card">
+            <strong>WebGPT (2021)</strong>
+            <div class="meta">Reward model + PPO fine‑tuning pipeline</div>
+            <a href="https://arxiv.org/abs/2112.09332" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>SayCan (2022)</strong>
+            <div class="meta">Language × affordance grounding (robotics inspiration)</div>
+            <a href="https://arxiv.org/abs/2204.01691" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>RT‑2 (2023)</strong>
+            <div class="meta">Treats actions as tokens in a VLM</div>
+            <a href="https://arxiv.org/abs/2307.15818" target="_blank" rel="noopener">arXiv</a>
+          </div>
+        </div>
+        <div class="do">
+          <strong>Doing:</strong> Use <a href="https://github.com/huggingface/trl" target="_blank" rel="noopener">Hugging Face TRL</a> for PPO. Train a simple reward model (“task success?”) on MiniWoB++ logs, then PPO‑tune your BC policy.
+        </div>
+      </section>
+
+      <!-- Phase 5 -->
+      <section id="phase5">
+        <div class="kicker">Weeks 8+</div>
+        <h2>Phase 5 — Toward General Computer Use</h2>
+        <span class="tag">VM benchmarks</span>
+        <span class="tag">End‑to‑end agents</span>
+        <div class="cards">
+          <div class="card">
+            <strong>OSWorld (2024)</strong>
+            <div class="meta">Real‑computer benchmark in virtual machines</div>
+            <a href="https://arxiv.org/abs/2404.07972" target="_blank" rel="noopener">arXiv</a>
+          </div>
+          <div class="card">
+            <strong>Survey: Generalist Computer‑Use Agents (2024)</strong>
+            <div class="meta">Overview of methods, data, and evals</div>
+            <a href="https://arxiv.org/abs/2406.03648" target="_blank" rel="noopener">arXiv</a>
+          </div>
+        </div>
+        <div class="do">
+          <strong>Doing:</strong> Connect your policy to a live browser with <a href="https://playwright.dev/" target="_blank" rel="noopener">Playwright</a> or <a href="https://www.selenium.dev/" target="_blank" rel="noopener">Selenium</a>. Add reflect‑and‑retry loops using a chat LLM.
+        </div>
+      </section>
+
+      <!-- HF Resources -->
+      <section id="hf">
+        <h2>Key Hugging Face Resources</h2>
+        <div class="cards">
+          <div class="card">
+            <strong>Datasets</strong>
+            <a href="https://huggingface.co/datasets/rico" target="_blank" rel="noopener">Rico</a>
+            <a href="https://huggingface.co/datasets/OSU-NLP/Mind2Web" target="_blank" rel="noopener">Mind2Web</a>
+            <a href="https://github.com/Farama-Foundation/miniwob-plusplus" target="_blank" rel="noopener">MiniWoB++ (GitHub)</a>
+          </div>
+          <div class="card">
+            <strong>Models</strong>
+            <a href="https://huggingface.co/google/vit-base-patch16-224" target="_blank" rel="noopener">ViT Base</a>
+            <a href="https://huggingface.co/Salesforce/blip2" target="_blank" rel="noopener">BLIP‑2</a>
+            <a href="https://huggingface.co/liuhaotian/LLaVA-13b-delta-v0" target="_blank" rel="noopener">LLaVA‑1.5 (delta)</a>
+          </div>
+          <div class="card">
+            <strong>RLHF</strong>
+            <a href="https://github.com/huggingface/trl" target="_blank" rel="noopener">TRL (PPO, DPO, etc.)</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="foot">Built for fast skimming. If a link breaks or you want a PDF mirror, ping me and I’ll swap it in.</div>
+    </div>
+  </main>
+</body>
+</html>
