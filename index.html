@@ -3,37 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Suyash — Learning Log</title>
-  <style>
-    body { font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 860px; margin: 40px auto; padding: 0 16px; }
-    h1 { margin-bottom: .25rem; }
-    .desc { color:#555; margin-top:0; }
-    ul { padding-left: 1.2rem; }
-    a { text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .meta { font-size: .92rem; color:#666; }
-    h2 { margin-top: 2rem; }
-  </style>
+  <meta name="theme-color" content="#0f1115" />
+  <title>Suyash — Learning & Projects</title>
+  <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <h1>Suyash — Topic Logbook</h1>
-  <p class="desc">Each topic is a single HTML file I update over time.</p>
+  <header class="site-header">
+    <div class="wrap">
+      <h1 class="site-title">Suyash — Learning & Projects</h1>
+      <div class="site-sub">Modern, focused notes and plans I’ll expand over time</div>
+    </div>
+  </header>
 
-  <!-- Pages section -->
-  <h2>Pages</h2>
-  <ul id="page-list">
-    <!-- Add general logbook links here later -->
-  </ul>
+  <main class="wrap layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h3>Sections</h3>
+      <a class="side-link" href="#intro">Home</a>
+      <a class="side-link" href="#now">Now</a>
+      <a class="side-link" href="#learning-log">Learning Log</a>
+      <!-- Future sections can be added here: Projects, Writing, etc. -->
+    </aside>
 
-  <!-- Things to Learn section -->
-  <h2>Things to Learn</h2>
-  <ul>
-    <li>
-      <a href="pages/vla-workflow.html">Vision–Language–Action (VLA): Research Learning Workflow</a>
-      <span class="meta">— phased syllabus with papers, datasets & doing plan</span>
-    </li>
-  </ul>
+    <!-- Main content -->
+    <div>
+      <section id="intro" class="panel">
+        <h2>Welcome</h2>
+        <p>I keep concise, living documents for topics I’m learning. Each topic gets its own page with an outline, links, and clear “doing next” actions.</p>
+        <p class="meta">Tip: Add a new page under <code>/pages</code> and link it in the sidebar section below.</p>
+      </section>
 
-  <p class="meta">Tip: I (or an agent) add new files under <code>/pages</code> and link them here.</p>
+      <section id="now" class="panel">
+        <div class="kicker">Current Focus</div>
+        <h2>What I’m Learning</h2>
+        <div>
+          <span class="tag">ML Systems</span>
+          <span class="tag">VLA Agents</span>
+          <span class="tag">UI Perception</span>
+        </div>
+        <p class="meta">These tags update as I shift attention.</p>
+      </section>
+
+      <section id="learning-log" class="panel">
+        <h2>Learning Log</h2>
+        <div class="cards">
+          <div class="card">
+            <strong>Vision–Language–Action (VLA)</strong>
+            <div class="meta">Phased workflow with datasets, papers, and hands‑on tasks</div>
+            <a href="pages/vla_learning_plan.html">Open the VLA Learning Plan →</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="foot">Made with a minimal dark theme. I’ll add more sections (Projects, Writing) as I go.</div>
+    </div>
+  </main>
 </body>
 </html>
