@@ -22,33 +22,33 @@
   </header>
   <main class="wrap">
     <section class="panel">
-      <h2>Briefing</h2>
-      <p>World of Bits (WoB) is an open‑domain platform for web‑based agents, targeting realism by letting agents act with low‑level keyboard and mouse inputs on actual web tasks. It addresses reproducibility via cached HTTP traffic and uses crowdworkers both to author tasks (natural language questions) and to provide demonstrations.</p>
-    </section>
-    <section class="panel">
-      <h2>Main Themes</h2>
-      <ul>
-        <li>Bridge the realism gap in RL by operating in web environments rather than purely synthetic games.</li>
-        <li>Enable research on web‑based RL with low‑level actions that mirror human interactions.</li>
-        <li>Ensure reproducibility on a transient web via HTTP caching and curated tasks.</li>
-      </ul>
-    </section>
-    <section class="panel">
-      <h2>Methodology</h2>
-      <ul>
-        <li>Crowdworkers create tasks defined by natural‑language questions.</li>
-        <li>Crowdworkers provide demonstrations using keyboard and mouse.</li>
-        <li>Cache HTTP traffic to approximate a stable, offline website snapshot.</li>
-      </ul>
-    </section>
-    <section class="panel">
-      <h2>Key Facts</h2>
-      <ul>
-        <li>Purpose: open‑domain platform to study realistic web tasks.</li>
-        <li>Action space: low‑level keyboard/mouse on web UIs.</li>
-        <li>Evidence: agents trained via behavioral cloning and RL succeed on multiple tasks.</li>
-      </ul>
-      <p class="meta">Source: Shi et al., ICML 2017 (World of Bits).</p>
+      <h2>Notes (verbatim)</h2>
+      <pre>Briefing: World of Bits (WoB) - An Open-Domain Platform for Web-Based Agents
+Source: Shi, T., Karpathy, A., Fan, L., Hernandez, J. & Liang, P. (2017). World of Bits: An Open-Domain Platform for Web-Based Agents. Proceedings of the 34th International Conference on Machine Learning, in Proceedings of Machine Learning Research 70:3135-3144.
+
+Date: 2017
+
+This briefing outlines the key aspects of "World of Bits" (WoB), an innovative platform designed to advance reinforcement learning (RL) research by enabling agents to perform tasks on the Internet using low-level keyboard and mouse actions.
+
+Main Themes:
+Addressing the Realism Gap in Reinforcement Learning: The core motivation behind WoB is to introduce "open-domain realism" into reinforcement learning, a characteristic currently lacking in simulated game environments. The authors argue that while these simulations have "greatly accelerated research," they do not mirror the complexity and variability found in "tasks in computer vision or natural language processing, which operate on artifacts created by humans in natural, organic settings." WoB aims to bridge this gap by offering a platform where agents interact with real-world web environments.
+Facilitating Research in Web-Based Reinforcement Learning: WoB is explicitly designed to "foster reinforcement learning research" in a web-based context. This involves enabling agents to perform tasks on the Internet using "low-level keyboard and mouse actions," thereby simulating how a human user would interact with a website.
+Key Challenges and Methodologies for Platform Development: The creation of WoB necessitated overcoming two significant challenges:
+Curating Diverse and Engaging Tasks: The first challenge was "to curate a large, diverse set of interesting web-based tasks." This was addressed by employing crowdworkers.
+Ensuring Reproducibility and Reward Structures: The second, and perhaps more critical, challenge was "to ensure that these tasks have a well-defined reward structure and are reproducible despite the transience of the web." The methodology to achieve this involves:
+Crowdworker Task Creation: Crowdworkers "create tasks defined by natural language questions."
+Demonstrations for Learning: Crowdworkers also "provide demonstrations of how to answer the question on real websites using keyboard and mouse."
+Caching for Reproducibility: To combat the inherent transience of the web, "HTTP traffic is cached to create a reproducible offline approximation of the web site." This ensures that the environment for agent training remains consistent.
+Demonstrated Success of Agent Training: The research concludes by showing the viability of the platform. Agents trained using established methods were successful in completing a variety of tasks within WoB. Specifically, the authors state that "agents trained via behavioral cloning and reinforcement learning can successfully complete a range of our web-based tasks."
+Most Important Ideas/Facts:
+WoB's Purpose: To provide an "open-domain platform for web-based agents" to enhance realism in RL research by operating on the Internet.
+Agent Interaction: Agents interact with web environments using "low-level keyboard and mouse actions."
+Core Problems Addressed: The lack of open-domain realism in existing RL environments and the transient nature of the web for research reproducibility.
+Task Generation Method: Crowdworkers define tasks using natural language and provide demonstrations.
+Reproducibility Solution: HTTP traffic caching creates "a reproducible offline approximation of the web site."
+Proof of Concept: Agents trained with behavioural cloning and reinforcement learning successfully completed tasks, validating the platform's effectiveness.
+In summary, World of Bits offers a crucial step forward for reinforcement learning by providing a realistic, diverse, and reproducible environment for training agents to navigate and interact with the dynamic and complex world of the Internet.</pre>
+      <p class="meta">Imported verbatim from notes/wob.txt</p>
     </section>
   </main>
 </body>
