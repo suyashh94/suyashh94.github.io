@@ -43,12 +43,12 @@
         <span class="tag">UI datasets</span>
         <span class="tag">RLHF template</span>
         <div class="cards">
-          <div class="card">
+          <div class="card" data-notes="world-of-bits-miniwob-icml-2017.html">
             <strong>World of Bits / MiniWoB (ICML 2017)</strong>
             <div class="meta">Benchmark for web‑based agents with low‑level actions</div>
             <a href="https://proceedings.mlr.press/v70/shi17a.html" target="_blank" rel="noopener">PMLR paper</a>
           </div>
-          <div class="card">
+          <div class="card" data-notes="workflow-guided-exploration-iclr-2018.html">
             <strong>Workflow‑Guided Exploration (ICLR 2018)</strong>
             <div class="meta">DOM‑aware RL on real websites</div>
             <a href="https://arxiv.org/abs/1802.08927" target="_blank" rel="noopener">arXiv</a>
@@ -215,16 +215,18 @@
           .replace(/-+/g,'-');
       }
       const cards = document.querySelectorAll('#phase1 .card, #phase2 .card, #phase3 .card, #phase4 .card, #phase5 .card');
+      const isFile = window.location.protocol === 'file:';
       cards.forEach(card => {
         const titleEl = card.querySelector('strong');
         if(!titleEl) return;
         const slug = slugify(titleEl.textContent);
-        const href = `papers/${slug}.html`;
+        const href = card.dataset.notes ? `papers/${card.dataset.notes}` : `papers/${slug}.html`;
         const badge = document.createElement('span');
         badge.className = 'badge';
         badge.textContent = 'Checking…';
         card.appendChild(badge);
         let hint;
+        let linkEl;
 
         // Mark the container as clickable (we'll disable if missing)
         card.classList.add('clickable');
@@ -245,20 +247,30 @@
         });
 
         // Probe for existence of the notes page
-        fetch(href, { method: 'HEAD' })
-          .then(r => {
-            if(r.ok){
-              card.dataset.exists = 'true';
-              badge.textContent = 'Notes available';
-            } else {
-              card.dataset.exists = 'false';
-              badge.textContent = 'Not read yet';
-            }
-          })
-          .catch(() => {
-            card.dataset.exists = 'false';
-            badge.textContent = 'Not read yet';
-          });
+        const onExists = () => {
+          card.dataset.exists = 'true';
+          badge.textContent = 'Notes available';
+          if(!linkEl){
+            linkEl = document.createElement('a');
+            linkEl.className = 'notes-link';
+            linkEl.href = href;
+            linkEl.textContent = 'My notes →';
+            card.appendChild(linkEl);
+          }
+        };
+        const onMissing = () => {
+          card.dataset.exists = 'false';
+          badge.textContent = 'Not read yet';
+        };
+
+        if (isFile && card.dataset.notes) {
+          // When opened as file://, fetch may fail; trust explicit data-notes links
+          onExists();
+        } else {
+          fetch(href, { method: 'GET', cache: 'no-store' })
+            .then(r => r.ok ? onExists() : onMissing())
+            .catch(onMissing);
+        }
       });
     })();
   </script>
