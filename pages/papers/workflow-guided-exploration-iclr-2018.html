@@ -14,6 +14,7 @@
       <div>
         <h1 class="site-title">Workflow‑Guided Exploration (ICLR 2018)</h1>
         <div class="site-sub">DOM‑aware RL on real websites · <a href="../vla_learning_plan.html">← Back to VLA</a></div>
+        <div class="post-meta">By Suyash · <span id="last-updated"></span></div>
       </div>
       <div class="right">
         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">Light Theme</button>
@@ -21,19 +22,75 @@
     </div>
   </header>
   <main class="wrap">
-    <section class="panel">
-      <h2>Summary</h2>
-      <p>WGE encodes high‑level task workflows that constrain exploration, improving sample‑efficiency on real, complex websites.</p>
-    </section>
-    <section class="panel">
-      <h2>Key Ideas</h2>
+    <article class="prose">
+      <h2>Workflow‑Guided Exploration for Web‑Based Interactive Tasks (ICLR 2018)</h2>
+      <h3>Key takeaways</h3>
       <ul>
-        <li>Leverage structure (forms, buttons, navigation) as priors.</li>
-        <li>Constrain policy search with workflow graphs.</li>
-        <li>Demonstrates improvements over naive RL on real sites.</li>
+        <li>Introduce <strong>workflows</strong> (high‑level action sketches) that constrain exploration in sparse‑reward web tasks.</li>
+        <li>Induce workflows from demonstrations or heuristics; use them to filter candidate UI actions step‑by‑step.</li>
+        <li>Collect successful trajectories under workflow constraints, then train a <strong>neural policy</strong> to act without the workflow.</li>
+        <li>DOM‑aware state and element representations are crucial for grounding actions on real pages.</li>
+        <li>Compared to naive RL, workflow‑guided exploration dramatically improves sample‑efficiency and success on real websites.</li>
       </ul>
-    </section>
+
+      <p class="lead">Web tasks have huge action spaces and sparse rewards. Random exploration almost never discovers a successful sequence (click the right element, type in the correct field, submit, navigate…). Workflow‑Guided Exploration (WGE) addresses this by providing a high‑level <em>workflow</em>—a partial program or policy sketch—that restricts exploration to plausible actions. WGE then trains a neural policy on the successful trajectories so it can act without the crutch.</p>
+
+      <h3>Problem</h3>
+      <p>In a browser environment, the agent observes the current page (screenshot and/or DOM) and an instruction (e.g., “Search for Stanford and open the first result”). Actions are low‑level UI events: click an element, type text into a field, press enter, follow a link, etc. Rewards are typically success/failure with little signal along the way. With hundreds of elements and many action types, naive RL struggles to even stumble upon a single success.</p>
+
+      <h3>Core idea: workflows as policy sketches</h3>
+      <p>A <em>workflow</em> is a high‑level, partially specified plan for the task—e.g., “focus the search input → type the query → submit → click first result”. At each step, a workflow defines a <em>filter</em> over valid actions (e.g., elements matching a selector, action types allowed next). Exploration is then constrained to actions that satisfy the current workflow step. The agent samples one of many workflows for the task, executes it stochastically within those constraints, and records any successful trajectories.</p>
+
+      <h3>How workflows are obtained</h3>
+      <p>Workflows can be <strong>induced from demonstrations</strong> by abstracting a human trajectory into element categories and action types (e.g., from a specific “#search” box to a generic “visible textbox near label ‘Search’”). Alternatively, they can be <strong>constructed heuristically</strong> from the instruction and common UI priors (e.g., “login” often implies “type username → type password → click submit”). The point isn’t perfection—workflows only need to dramatically narrow the search space.</p>
+
+      <h3>DOM‑aware state and actions</h3>
+      <p>The agent represents page elements using DOM features: tag (input/button/a), attributes (id, name, type), text content, visibility, location/size, and relation to labeled text. A candidate action is a tuple like (action_type, element, optional_text). During workflow‑guided exploration, the candidate set is filtered by the workflow step; during neural execution, the policy scores all candidates directly.</p>
+
+      <h3>Algorithm</h3>
+      <ol>
+        <li><strong>Induce workflows</strong> for each task from demonstrations or heuristics. Each workflow is a sequence of filters over actions/elements.</li>
+        <li><strong>Guided exploration:</strong> sample a workflow; at each step, restrict candidate actions by the workflow filter; sample and execute one; continue until success/failure.</li>
+        <li><strong>Collect successes</strong> and label them as training data (state, action, outcome).</li>
+        <li><strong>Train a neural policy</strong> (e.g., element scoring + action head) on these trajectories using supervised learning and/or policy gradients.</li>
+        <li><strong>Iterate:</strong> as the neural policy improves, use it to propose better actions within workflow constraints, harvesting more successes.</li>
+      </ol>
+
+      <h3>Neural policy</h3>
+      <p>A typical architecture embeds the instruction (text encoder) and each DOM element (feature encoder). It then scores element–action pairs and selects the next action. The workflow is <em>not</em> used at test time: it only served to collect data efficiently. Training can mix <strong>behavior cloning</strong> on the collected successes with <strong>policy‑gradient</strong> updates using sparse rewards.</p>
+
+      <h3>Why it works</h3>
+      <p>Workflows inject strong structure, slashing the combinatorial action space. Even if a workflow is imperfect, it usually filters out most nonsense actions (e.g., clicking decorative divs or typing into the wrong field). This greatly increases the probability of stumbling on complete, successful trajectories, which are exactly what a neural policy needs to learn robust behavior.</p>
+
+      <h3>Evaluation (qualitative)</h3>
+      <p>On real websites and realistic tasks (logins, search + navigate, form filling), workflow‑guided exploration discovers successes far more reliably than naive RL. The resulting neural policies reach higher success rates with fewer interactions. Mini‑tasks akin to MiniWoB benefit as well, but the gains are largest where the DOM is large and rewards are sparse.</p>
+
+      <h3>Failure modes</h3>
+      <ul>
+        <li><strong>Workflow drift:</strong> If a workflow filter is too strict or mismatched to the page, exploration can stall.</li>
+        <li><strong>Ambiguous elements:</strong> Multiple elements may match a generic filter (e.g., many text inputs); tie‑breaking heuristics matter.</li>
+        <li><strong>Generalization gaps:</strong> Policies overfit to element text/structure seen in training; regularization and diversity in tasks help.</li>
+      </ul>
+
+      <h3>Reproducing WGE today</h3>
+      <ol>
+        <li>Parse the DOM; build element features (tag/attrs/text/visibility/position, plus relations to nearby labels).</li>
+        <li>Define a small library of workflow templates (e.g., search, login, checkout) and an induction step to generalize demos into filters.</li>
+        <li>Run guided exploration to harvest successful trajectories; log screenshots, DOM diffs, and actions.</li>
+        <li>Train a neural element‑scorer + action head with BC; add policy‑gradient fine‑tuning with sparse rewards.</li>
+        <li>Iterate: refresh workflows, hard‑negative mine confusing elements, and expand tasks.</li>
+      </ol>
+
+      <p class="meta">Paper link: <a href="https://arxiv.org/abs/1802.08927" target="_blank" rel="noopener">Workflow‑Guided Exploration for Web‑Based Interactive Tasks (ICLR 2018)</a></p>
+    </article>
   </main>
+  <script>
+    (function(){
+      var el = document.getElementById('last-updated');
+      if(!el) return;
+      var d = new Date();
+      el.textContent = 'Last updated: ' + d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    })();
+  </script>
 </body>
 </html>
-
