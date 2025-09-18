@@ -22,7 +22,93 @@
   </header>
   <main class="wrap">
     <section class="panel">
-      <h2>Notes (verbatim)</h2>
+      <div class="kicker">Paper Overview</div>
+      <h2>World of Bits: An Open‑Domain Platform for Web‑Based Agents (ICML 2017)</h2>
+      <p>
+        World of Bits (WoB) proposes a realistic testbed for agents that operate computers via the web. Instead of game‑like simulators,
+        WoB exposes agents to real websites and miniature web tasks, interacting with low‑level <em>keyboard</em> and <em>mouse</em> events like a human user.
+        The goal is to close the “realism gap” in RL by studying perception, language understanding, and action in everyday interfaces.
+      </p>
+      <p class="meta">
+        Paper: <a href="https://proceedings.mlr.press/v70/shi17a.html" target="_blank" rel="noopener">Shi et&nbsp;al., ICML 2017 — PMLR v70</a>
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Why it matters</h2>
+      <ul>
+        <li><strong>Realism over games:</strong> Research on RL agents often uses synthetic environments; WoB targets <em>real websites</em> and practical mini‑tasks that resemble everyday computer use.</li>
+        <li><strong>Multimodality:</strong> Agents must parse text (instructions), vision (screens), and structure (forms, buttons) to decide actions.</li>
+        <li><strong>Generalization:</strong> Web tasks vary widely; progress here often transfers to broader computer‑use agents.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>What’s in WoB</h2>
+      <ul>
+        <li><strong>MiniWoB:</strong> A suite of small, controlled web tasks (e.g., click a button, fill a form, drag a slider). These are ideal for rapid iteration and ablations.</li>
+        <li><strong>Real‑web tasks:</strong> Crowdsourced tasks on actual websites with natural‑language goals and demonstrations from human workers.</li>
+        <li><strong>Low‑level actions:</strong> Agents act via mouse and keyboard events (click, type, focus, submit, scroll), mirroring human interaction.</li>
+        <li><strong>Reproducibility:</strong> HTTP caching creates a stable, offline approximation of sites to counter the transience of the web.</li>
+        <li><strong>Demonstrations + RL:</strong> Human demos bootstrap learning (behavior cloning), and RL fine‑tunes policies on task rewards.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Problem setup</h2>
+      <ul>
+        <li><strong>Input:</strong> An instruction (e.g., “Book a flight on X”), plus visual/structural context from the page.</li>
+        <li><strong>Action space:</strong> Low‑level events on DOM elements or coordinates; sequences form full workflows.</li>
+        <li><strong>Success signal:</strong> Task‑specific checks (e.g., presence of expected text, page state) define rewards and episode termination.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Data and reproducibility</h2>
+      <ul>
+        <li><strong>Crowd‑authored tasks:</strong> Workers define natural‑language tasks and provide demonstrations by completing them.</li>
+        <li><strong>Cached web:</strong> HTTP traffic is cached so tasks can be reliably replayed offline for training and evaluation.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Learning recipes</h2>
+      <ul>
+        <li><strong>Behavior cloning (BC):</strong> Supervised learning on demo trajectories to initialize a competent policy.</li>
+        <li><strong>Reinforcement learning (RL):</strong> Fine‑tune with task rewards once a policy starts to succeed.</li>
+      </ul>
+      <p class="meta">The original work shows agents trained with BC and RL can complete a range of WoB tasks.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Limitations and gotchas</h2>
+      <ul>
+        <li><strong>Fragility to layout changes:</strong> Real websites evolve; cached snapshots help but can drift from production sites.</li>
+        <li><strong>State explosion:</strong> The space of interactions is vast; careful action schemas and curriculum help.</li>
+        <li><strong>Evaluation:</strong> Success criteria need to be precise to avoid reward hacking.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Where this led next</h2>
+      <ul>
+        <li><strong>MiniWoB++</strong> and follow‑ups that standardized tasks and tooling.</li>
+        <li><strong>Workflow‑Guided Exploration</strong> (ICLR’18) adding structure‑aware exploration on real sites.</li>
+        <li><strong>Mind2Web, OSWorld</strong> and modern agents that operate full browsers/VMs with multimodal models.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Get started today</h2>
+      <ul>
+        <li>Prototype on MiniWoB/++ tasks to test observation encodings and action schemas.</li>
+        <li>Use behavior cloning on demos, then RL for refinement.</li>
+        <li>For real‑site tasks, couple a browser driver (e.g., Playwright/Selenium) with caching/replay to stabilize training.</li>
+      </ul>
+      <p class="meta">See also the VLA learning plan for downstream datasets and agents.</p>
+    </section>
+    <section class="panel">
+      <h2>Original Notes (verbatim)</h2>
       <pre>Briefing: World of Bits (WoB) - An Open-Domain Platform for Web-Based Agents
 Source: Shi, T., Karpathy, A., Fan, L., Hernandez, J. & Liang, P. (2017). World of Bits: An Open-Domain Platform for Web-Based Agents. Proceedings of the 34th International Conference on Machine Learning, in Proceedings of Machine Learning Research 70:3135-3144.
 
