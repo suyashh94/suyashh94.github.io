@@ -22,22 +22,34 @@
   </header>
   <main class="wrap">
     <section class="panel">
-      <h2>Summary</h2>
-      <p>MiniWoB provides a suite of browser tasks (forms, buttons, etc.) with programmatic interfaces, enabling supervised and RL studies of low‑level UI interactions.</p>
+      <h2>Briefing</h2>
+      <p>World of Bits (WoB) is an open‑domain platform for web‑based agents, targeting realism by letting agents act with low‑level keyboard and mouse inputs on actual web tasks. It addresses reproducibility via cached HTTP traffic and uses crowdworkers both to author tasks (natural language questions) and to provide demonstrations.</p>
     </section>
     <section class="panel">
-      <h2>Key Contributions</h2>
+      <h2>Main Themes</h2>
       <ul>
-        <li>Standardized, reproducible UI task set for RL.</li>
-        <li>Action space over DOM/low‑level events for fine‑grained control.</li>
-        <li>Baseline agents and evaluation protocols.</li>
+        <li>Bridge the realism gap in RL by operating in web environments rather than purely synthetic games.</li>
+        <li>Enable research on web‑based RL with low‑level actions that mirror human interactions.</li>
+        <li>Ensure reproducibility on a transient web via HTTP caching and curated tasks.</li>
       </ul>
     </section>
     <section class="panel">
-      <h2>Notes</h2>
-      <p>Use as a sandbox to debug action schemas and reward shaping before scaling to real sites.</p>
+      <h2>Methodology</h2>
+      <ul>
+        <li>Crowdworkers create tasks defined by natural‑language questions.</li>
+        <li>Crowdworkers provide demonstrations using keyboard and mouse.</li>
+        <li>Cache HTTP traffic to approximate a stable, offline website snapshot.</li>
+      </ul>
+    </section>
+    <section class="panel">
+      <h2>Key Facts</h2>
+      <ul>
+        <li>Purpose: open‑domain platform to study realistic web tasks.</li>
+        <li>Action space: low‑level keyboard/mouse on web UIs.</li>
+        <li>Evidence: agents trained via behavioral cloning and RL succeed on multiple tasks.</li>
+      </ul>
+      <p class="meta">Source: Shi et al., ICML 2017 (World of Bits).</p>
     </section>
   </main>
 </body>
 </html>
-
