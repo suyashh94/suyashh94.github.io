@@ -5,48 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0f1115" />
   <link rel="stylesheet" href="../assets/styles.css" />
+  <script src="../assets/theme.js" defer></script>
   <title>Vision–Language–Action (VLA) — Research Learning Workflow</title>
   <style>
-    :root{
-      --bg:#0f1115; --panel:#161a22; --panel2:#1c2230; --text:#e8eef7; --muted:#9fb0c9; --acc:#64b5ff; --acc2:#7ef0c4;
-      --border: #253046;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#0d1016);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;background:rgba(15,17,21,.85);backdrop-filter:saturate(150%) blur(10px);border-bottom:1px solid var(--border)}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    h1{font-size:clamp(20px,3vw,32px);margin:8px 0 6px}
-    .sub{color:var(--muted);font-size:14px}
-    .grid{display:grid;grid-template-columns:280px 1fr;gap:18px}
-    nav{position:sticky;top:74px;align-self:start;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
-    nav h3{margin:0 0 10px;font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-    nav a{display:block;padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px;border:1px solid transparent}
-    nav a:hover{background:var(--panel2);border-color:var(--border)}
-    section{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
-    h2{margin:0 0 10px;font-size:20px}
-    .tag{display:inline-block;border:1px solid var(--border);background:var(--panel2);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--muted);margin:2px 6px 8px 0}
-    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:8px}
-    .card{background:linear-gradient(180deg,var(--panel2),#161b27);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
-    .card a{color:var(--acc);text-decoration:none}
-    .card a:hover{text-decoration:underline}
-    .meta{color:var(--muted);font-size:12px}
     .do{border-left:3px solid var(--acc2);padding-left:10px;margin-top:6px}
-    .kicker{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
-    .foot{color:var(--muted);font-size:12px;text-align:center;margin:22px 0}
-    code{background:#0b0e13;border:1px solid var(--border);padding:2px 5px;border-radius:6px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <header>
+  <header class="site-header">
     <div class="wrap">
-      <h1>Vision–Language–Action (VLA): Research Learning Workflow</h1>
-      <div class="sub">A phased syllabus with verified papers, datasets, and hands‑on tasks for UI‑acting agents · <a href="../index.html">← Back to Home</a></div>
+      <div>
+        <h1 class="site-title">Vision–Language–Action (VLA): Research Learning Workflow</h1>
+        <div class="site-sub">A phased syllabus with verified papers, datasets, and hands‑on tasks for UI‑acting agents · <a href="../index.html">← Back to Home</a></div>
+      </div>
+      <div class="right">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">Light Theme</button>
+      </div>
     </div>
   </header>
 
-  <main class="wrap grid">
-    <nav>
+  <main class="wrap layout">
+    <nav class="sidebar">
       <h3>On this page</h3>
       <a href="#phase1">Phase 1 — Foundations</a>
       <a href="#phase2">Phase 2 — UI Perception</a>
@@ -58,7 +37,7 @@
 
     <div>
       <!-- Phase 1 -->
-      <section id="phase1">
+      <section id="phase1" class="panel">
         <h2>Phase 1 — Foundations</h2>
         <span class="tag">Benchmarks</span>
         <span class="tag">UI datasets</span>
@@ -96,7 +75,7 @@
       </section>
 
       <!-- Phase 2 -->
-      <section id="phase2">
+      <section id="phase2" class="panel">
         <h2>Phase 2 — Modern UI Perception</h2>
         <span class="tag">Grounding</span>
         <span class="tag">Multitask pretraining</span>
@@ -123,7 +102,7 @@
       </section>
 
       <!-- Phase 3 -->
-      <section id="phase3">
+      <section id="phase3" class="panel">
         <h2>Phase 3 — Perception → Action</h2>
         <span class="tag">Behavior cloning</span>
         <span class="tag">Action schemas</span>
@@ -150,7 +129,7 @@
       </section>
 
       <!-- Phase 4 -->
-      <section id="phase4">
+      <section id="phase4" class="panel">
         <h2>Phase 4 — RL & Preference Optimization</h2>
         <span class="tag">RLHF</span>
         <span class="tag">PPO</span>
@@ -177,7 +156,7 @@
       </section>
 
       <!-- Phase 5 -->
-      <section id="phase5">
+      <section id="phase5" class="panel">
         <h2>Phase 5 — Toward General Computer Use</h2>
         <span class="tag">VM benchmarks</span>
         <span class="tag">End‑to‑end agents</span>
@@ -199,7 +178,7 @@
       </section>
 
       <!-- HF Resources -->
-      <section id="hf">
+      <section id="hf" class="panel">
         <h2>Key Hugging Face Resources</h2>
         <div class="cards">
           <div class="card">
@@ -229,8 +208,8 @@
       function slugify(text){
         return (text||'')
           .toLowerCase()
-          .replace(/\(.*?\)/g,'')
-          .replace(/[^a-z0-9\s-]/g,'')
+          .replace(/[()]/g,'')              // drop paren chars, keep content
+          .replace(/[^a-z0-9\s-]/g,'')      // remove other punctuation
           .trim()
           .replace(/\s+/g,'-')
           .replace(/-+/g,'-');
@@ -245,6 +224,7 @@
         badge.className = 'badge';
         badge.textContent = 'Checking…';
         card.appendChild(badge);
+        let hint;
 
         // Mark the container as clickable (we'll disable if missing)
         card.classList.add('clickable');
@@ -254,7 +234,13 @@
           if(card.dataset.exists === 'true') {
             window.location.href = href;
           } else {
-            badge.textContent = "Not read yet";
+            badge.textContent = 'Not read yet';
+            if(!hint){
+              hint = document.createElement('div');
+              hint.className = 'hint';
+              hint.textContent = 'Notes page missing. I haven’t read this yet.';
+              card.appendChild(hint);
+            }
           }
         });
 

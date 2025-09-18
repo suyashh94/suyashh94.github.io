@@ -6,12 +6,18 @@
   <meta name="theme-color" content="#0f1115" />
   <title>Suyash — Learning & Projects</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/theme.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="wrap">
-      <h1 class="site-title">Suyash — Learning & Projects</h1>
-      <div class="site-sub">Modern, focused notes and plans I’ll expand over time</div>
+      <div>
+        <h1 class="site-title">Suyash — Learning & Projects</h1>
+        <div class="site-sub">Modern, focused notes and plans I’ll expand over time</div>
+      </div>
+      <div class="right">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">Light Theme</button>
+      </div>
     </div>
   </header>
 
@@ -22,6 +28,8 @@
       <a class="side-link" href="#intro">Home</a>
       <a class="side-link" href="#now">Now</a>
       <a class="side-link" href="#learning-log">Learning Log</a>
+      <a class="side-link" href="pages/projects.html">Projects</a>
+      <a class="side-link" href="pages/writing.html">Writing</a>
       <!-- Future sections can be added here: Projects, Writing, etc. -->
     </aside>
 
@@ -51,6 +59,22 @@
             <strong>Vision–Language–Action (VLA)</strong>
             <div class="meta">Phased workflow with datasets, papers, and hands‑on tasks</div>
             <a href="pages/vla_learning_plan.html">Open the VLA Learning Plan →</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="more" class="panel">
+        <h2>More</h2>
+        <div class="cards">
+          <div class="card">
+            <strong>Projects</strong>
+            <div class="meta">Small builds and experiments</div>
+            <a href="pages/projects.html">Browse Projects →</a>
+          </div>
+          <div class="card">
+            <strong>Writing</strong>
+            <div class="meta">Notes and short posts</div>
+            <a href="pages/writing.html">Read Writing →</a>
           </div>
         </div>
       </section>
