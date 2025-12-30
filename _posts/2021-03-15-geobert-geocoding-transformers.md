@@ -338,7 +338,7 @@ I've open-sourced the NYC demonstration version of GeoBERT. You'll find:
 <div style="border: 2px solid #333; border-radius: 10px; padding: 20px; margin: 20px 0; background-color: #f5f5f5;">
 <h4 style="color: #333;">📦 GeoBERT Repository</h4>
 <p style="color: #333;">Full source code, training scripts, and deployment utilities.</p>
-<a href="https://github.com/suyash94/geobert-nyc" target="_blank" style="display: inline-block; background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View on GitHub →</a>
+<a href="https://github.com/suyashh94/geobert-nyc" target="_blank" style="display: inline-block; background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View on GitHub →</a>
 </div>
 
 ---
