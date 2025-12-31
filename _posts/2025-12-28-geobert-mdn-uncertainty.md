@@ -434,4 +434,4 @@ For production systems that route real deliveries to real addresses, knowing *ho
 - **Demo**: [huggingface.co/spaces/suyash94/geobert-nyc-geocoder](https://huggingface.co/spaces/suyash94/geobert-nyc-geocoder)
 - **Previous Post**: [Teaching BERT to Read Maps: GeoBERT](/posts/geobert-geocoding-transformers/)
 - **MDN Original Paper**: [Bishop, 1994 - Mixture Density Networks](https://publications.aston.ac.uk/id/eprint/373/)
-- **Uncertainty in Deep Learning**: [Gal, 2016 - PhD Thesis](http://www.cs.ox.ac.uk/people/yarin.gal/website/thesis/thesis.pdf)
+
