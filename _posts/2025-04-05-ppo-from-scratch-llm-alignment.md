@@ -549,7 +549,7 @@ The complete implementation is available on GitHub:
 <div style="border: 2px solid #333; border-radius: 10px; padding: 20px; margin: 20px 0; background-color: #f5f5f5;">
 <h4 style="color: #333;">📦 Qwen PPO Tuning Repository</h4>
 <p style="color: #333;">PPO implementation for fine-tuning Qwen 1.5B with torchtune. Includes configurable hyperparameters, mixed precision training, and comprehensive metrics logging.</p>
-<a href="https://github.com/suyashh94/qwen-ppo-tuning" target="_blank" style="display: inline-block; background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View on GitHub →</a>
+<a href="https://github.com/suyashh94/ppo-tuning-from-scratch" target="_blank" style="display: inline-block; background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View on GitHub →</a>
 </div>
 
 ```bash
