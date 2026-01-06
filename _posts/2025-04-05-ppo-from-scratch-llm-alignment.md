@@ -1,8 +1,8 @@
 ---
 title: "PPO from Scratch: Implementing Proximal Policy Optimization for LLM Alignment"
 date: 2025-04-05 10:00:00 +0530
-categories: [Side Projects]
-tags: [reinforcement-learning, ppo, transformers, llm, pytorch, alignment, deep-learning]
+categories: [Side Projects, From-Scratch Implementations]
+tags: [reinforcement-learning, ppo, transformers, llm, pytorch, alignment, deep-learning, RLHF]
 description: "A complete implementation of Proximal Policy Optimization for fine-tuning language models, with detailed explanations of GAE, clipped objectives, and the training dynamics that make RLHF work."
 image:
   path: /assets/img/posts/ppo/ppo_cover.png
