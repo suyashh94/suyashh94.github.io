@@ -554,7 +554,7 @@ The complete implementation is available on GitHub:
 
 ```bash
 # Clone and setup
-git clone https://github.com/suyashh94/qwen-ppo-tuning
+git clone https://github.com/suyashh94/ppo-tuning-from-scratch
 cd qwen-ppo-tuning
 pip install -e .
 
