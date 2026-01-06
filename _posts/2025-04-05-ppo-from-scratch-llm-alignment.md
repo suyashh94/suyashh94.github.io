@@ -37,7 +37,7 @@ Consider a language model completing the prompt: *"I think the book was..."*
 
 The base model might continue with anything—positive sentiment, negative sentiment, factual description, tangential rambling. It has no preference. It simply models $P(\text{next token} | \text{context})$ based on its pre-training corpus.
 
-We want to *steer* this distribution. Make the model prefer completions that a reward model scores highly. In our implementation, we use sentiment as the reward signal—positive sentiment yields positive rewards, negative sentiment yields penalties. We also reward for response length. If the generation is longer than 50 tokens, we penalize the reward with a penalty of -10. Overall, we want to reward short positive sentiment completions. 
+We want to *steer* this distribution. Make the model prefer completions that a reward model scores highly. In our implementation, we use sentiment as the reward signal—positive sentiment yields positive rewards, negative sentiment yields penalties. We also implicitly reward for response length: if a generation exceeds 50 tokens without producing an EOS token, it receives a -10 penalty. Overall, we want to reward short, positive sentiment completions that properly terminate.
 
 The challenge: we can't just maximize reward greedily. A model that always outputs "Great! Amazing! Wonderful!" would score high on sentiment but become useless. We need to:
 
@@ -123,7 +123,9 @@ class SentimentRewarder(nn.Module):
         return {"reward": reward, "label": dominant_label, ...}
 ```
 
-The asymmetric reward structure (positive: +10, negative: -1) encourages positive sentiment while not overly penalizing neutral or negative outputs. The confidence scaling adds nuance—a tentatively positive completion scores lower than an enthusiastically positive one. When calculating the reward, before passing through the reward model, we check for EOS token in the generations. If generation is missing the EOS token, we assign the reward of -10 to that generation. Only in the cases where EOS token is found, we pass the generations over to the reward model, for rewards to be caluculated. 
+The asymmetric reward structure (positive: +10, negative: -1) encourages positive sentiment while not overly penalizing neutral or negative outputs. The confidence scaling adds nuance—a tentatively positive completion scores lower than an enthusiastically positive one.
+
+**EOS Penalty:** Before passing generations through the sentiment reward model, we first check for the EOS token. If a generation is missing the EOS token (i.e., it hit the max token limit without properly terminating), we assign a reward of -10 to that generation immediately. Only generations that contain an EOS token are passed to the sentiment model for reward calculation. This strongly incentivizes the model to learn proper response termination.
 
 ---
 
@@ -405,6 +407,22 @@ The base model generates verbose, meandering completions without termination. Th
 
 ![Model Comparison](/assets/img/posts/ppo/model_comparison.png)
 *Side-by-side comparison of base and aligned model outputs. The aligned model consistently produces positive sentiment and proper EOS termination.*
+
+---
+
+## Try It Yourself
+
+Want to see the difference live? I've deployed both models to a HuggingFace Space where you can enter your own prompts and compare the base vs aligned model outputs in real-time:
+
+<iframe
+	src="https://suyash94-qwen-ppo-sentiment-demo.hf.space"
+	frameborder="0"
+	width="100%"
+	height="650"
+    style="border: 1px solid #ddd; border-radius: 8px;"
+></iframe>
+
+*Try prompts like "The restaurant experience was", "I think the book was", or "Overall, the product is" to see how the aligned model generates short, positive completions while the base model rambles.*
 
 ---
 
