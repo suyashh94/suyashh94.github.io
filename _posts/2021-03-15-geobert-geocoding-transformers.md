@@ -12,9 +12,9 @@ mermaid: true
 pin: true
 ---
 
-## The Problem That Kept Me Up at Night
+## The Problem At Hand
 
-It was August 2020. The world was grappling with a pandemic, and I was grappling with addresses.
+It was August 2020. The world was grappling with a pandemic, and we were grappling with addresses.
 
 I was working at a logistics company in India that delivered over 100,000 orders every single day. Each order needed to reach its destination, and each destination started as nothing more than a string of text—an address scribbled by a customer, often incomplete, sometimes cryptic, always uniquely Indian.
 
