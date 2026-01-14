@@ -4,7 +4,6 @@ title: "Breaking the Cold Start Barrier: How Guidance Injection Accelerates Rein
 date: 2026-01-14
 categories: [Experiments, Side Projects, From-Scratch Implementations]
 tags: [GRPO, VLM, Qwen2-VL, RL fine-tuning, guidance injection, PPO]
-author: Suyash Shringarpure
 image: /assets/img/posts/grpo/grpo_cover.png
 description: "An empirical study on GRPO training dynamics for vision-language models, exploring the tradeoffs between learning speed and cross-domain generalization when using guidance injection."
 math: true
