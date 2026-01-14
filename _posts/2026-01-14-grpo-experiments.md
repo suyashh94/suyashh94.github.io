@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Breaking the Cold Start Barrier: How Guidance Injection Accelerates Reinforcement Learning in Vision-Language Models"
-date: 2025-01-14
+date: 2026-01-14
 categories: [Experiments, Side Projects, From-Scratch Implementations]
 tags: [GRPO, VLM, Qwen2-VL, RL fine-tuning, guidance injection, PPO]
 author: Suyash Shringarpure
