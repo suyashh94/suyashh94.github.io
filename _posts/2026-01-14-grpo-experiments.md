@@ -5,7 +5,7 @@ date: 2025-01-14
 categories: [Experiments, Side Projects, From-Scratch Implementations]
 tags: [GRPO, VLM, Qwen2-VL, RL fine-tuning, guidance injection, PPO]
 author: Suyash Shringarpure
-image: /assets/img/posts/grpogrpo_cover.png
+image: /assets/img/posts/grpo/grpo_cover.png
 description: "An empirical study on GRPO training dynamics for vision-language models, exploring the tradeoffs between learning speed and cross-domain generalization when using guidance injection."
 math: true
 ---
@@ -14,7 +14,7 @@ Reinforcement Learning from Human Feedback (RLHF) has revolutionized how we alig
 
 In this post, we explore Group Relative Policy Optimization (GRPO) for fine-tuning vision-language models on counting tasks. We uncover a fundamental cold start problem in RL training and introduce **Guidance Injection**—a technique that bootstraps learning by providing expert demonstrations during training. Most importantly, we discover a surprising tradeoff: injection accelerates learning but can *hurt* cross-domain generalization.
 
-![Cover image showing GRPO concept](/assets/img/posts/grpogrpo_cover.png)
+![Cover image showing GRPO concept](/assets/img/posts/grpo/grpo_cover.png)
 *GRPO learns by comparing multiple responses to the same prompt, reinforcing better outputs over worse ones.*
 
 ---
@@ -100,7 +100,7 @@ Group Relative Policy Optimization, introduced in the DeepSeekMath paper, takes 
 
 Here's the key insight: for each prompt, sample multiple responses and let the rewards themselves determine relative quality.
 
-![GRPO Algorithm Diagram](/assets/img/posts/grpogrpo_algorithm.png)
+![GRPO Algorithm Diagram](/assets/img/posts/grpo/grpo_algorithm.png)
 *GRPO samples multiple responses per prompt, normalizes rewards within each group, then updates the policy to increase probability of relatively better responses.*
 
 **The GRPO advantage calculation:**
@@ -218,7 +218,7 @@ At 14.5%, about 71% of our training batches had useful gradient signal. This was
 
 When GRPO training does work, we observed a fascinating two-phase learning pattern in our experiments. **This pattern is specific to our task structure**—where the model needs to learn both output format and task accuracy—and may not generalize to all RL fine-tuning scenarios.
 
-![Format vs Accuracy Learning](/assets/img/posts/grpoformat_vs_accuracy.png)
+![Format vs Accuracy Learning](/assets/img/posts/grpo/format_vs_accuracy.png)
 *GRPO training on our counting task shows distinct phases: first the model learns output format, then it refines accuracy.*
 
 ### Phase 1: Format Learning (Steps 0-600)
@@ -352,7 +352,7 @@ We trained two models on the CLEVR dataset with the default (weak baseline) prom
 
 ### Training Dynamics
 
-![Learning Curves Default](/assets/img/posts/grpolearning_curves_default.png)
+![Learning Curves Default](/assets/img/posts/grpo/learning_curves_default.png)
 *Training dynamics with weak baseline (14% digit rate). Injection dramatically accelerates early learning but converges to similar final performance.*
 
 The training curves reveal stark differences:
@@ -387,7 +387,7 @@ But the story changes dramatically when we evaluate on **SuperCLEVR**—a differ
 - Different object shapes and textures  
 - Varied question phrasings (not just our training template)
 
-![Injection Effect Summary](/assets/img/posts/grpoinjection_effect_summary.png)
+![Injection Effect Summary](/assets/img/posts/grpo/injection_effect_summary.png)
 *Cross-domain transfer reveals injection's hidden cost: faster learning but significantly worse generalization.*
 
 | Approach | SuperCLEVR Accuracy | Number Present Rate |
@@ -430,7 +430,7 @@ The ones that happen to contain digits get higher relative rewards. Over many tr
 
 This learning is **domain-agnostic**—it's not tied to specific visual features because the model discovered the format from its own varied outputs across varied images.
 
-![Key Takeaway](/assets/img/posts/grpokey_takeaway.png)
+![Key Takeaway](/assets/img/posts/grpo/key_takeaway.png)
 *The fundamental insight: injection couples format learning to training domain features, while exploration-based learning keeps format and domain separable.*
 
 ### A Mechanistic Hypothesis
@@ -476,7 +476,7 @@ Output the thinking process in <think> </think> and final answer
 
 This simple prompt change transformed baseline performance:
 
-![Baseline Comparison](/assets/img/posts/grpobaseline_comparison.png)
+![Baseline Comparison](/assets/img/posts/grpo/baseline_comparison.png)
 *Prompt engineering creates a strong baseline with 99% digit extraction rate, vs. 14% for the default prompt—a 6.8x improvement.*
 
 | Prompt Style | Base Digit Rate | Base Accuracy |
@@ -492,7 +492,7 @@ With the R1V prompt, the model almost always produces responses in the `<think>.
 
 We repeated our experiments with the R1V prompt:
 
-![Learning Curves R1V](/assets/img/posts/grpolearning_curves_r1v.png)
+![Learning Curves R1V](/assets/img/posts/grpo/learning_curves_r1v.png)
 *With strong baseline (R1V prompt), both injection and no-injection approaches show similar learning dynamics.*
 
 **Training Dynamics:**
@@ -509,7 +509,7 @@ With the strong baseline:
 
 **Cross-Domain Transfer:**
 
-![Transfer Results](/assets/img/posts/grpotransfer_results.png)
+![Transfer Results](/assets/img/posts/grpo/transfer_results.png)
 *With strong baseline, both training methods achieve similar cross-domain transfer to SuperCLEVR.*
 
 | Condition | SuperCLEVR Accuracy |
@@ -522,10 +522,10 @@ The dramatic generalization gap we saw with weak baseline (30% vs. 48%) nearly d
 
 ### The Complete Picture
 
-![Results Summary](/assets/img/posts/grporesults_summary_bar.png)
+![Results Summary](/assets/img/posts/grpo/results_summary_bar.png)
 *Summary of all experimental conditions showing how baseline strength affects the injection decision.*
 
-![Results Table](/assets/img/posts/grporesults_table_v2.png)
+![Results Table](/assets/img/posts/grpo/results_table_v2.png)
 *Complete results table across all conditions. The number of training steps also varies between conditions.*
 
 | Baseline | Injection | CLEVR | SuperCLEVR | Steps |
