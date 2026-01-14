@@ -8,7 +8,6 @@ description: "A complete implementation of Proximal Policy Optimization for fine
 image:
   path: /assets/img/posts/grpo/grpo_cover.png
   alt: GRPO from Scratch - Reinforcement Learning for Language Model Alignment
-author: Suyash Harlalka
 math: true
 mermaid: true
 pin: true
