@@ -15,7 +15,6 @@ Reinforcement Learning from Human Feedback (RLHF) has revolutionized how we alig
 
 In this post, we explore Group Relative Policy Optimization (GRPO) for fine-tuning vision-language models on counting tasks. We uncover a fundamental cold start problem in RL training and introduce **Guidance Injection**—a technique that bootstraps learning by providing expert demonstrations during training. Most importantly, we discover a surprising tradeoff: injection accelerates learning but can *hurt* cross-domain generalization.
 
-![Cover image showing GRPO concept](/assets/img/posts/grpo/grpo_cover.png)
 *GRPO learns by comparing multiple responses to the same prompt, reinforcing better outputs over worse ones.*
 
 ---
