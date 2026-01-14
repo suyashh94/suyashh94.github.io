@@ -81,7 +81,9 @@ PPO, introduced by Schulman et al. (2017), has become the workhorse of RLHF. Its
 
 $$L^{PPO}(\theta) = \mathbb{E}_t \left[ \min\left( r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right) \right]$$
 
-where $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$ is the probability ratio and $\hat{A}_t$ is the advantage estimate.
+where $r_t(\theta)$ is the probability ratio and $\hat{A}_t$ is the advantage estimate:
+
+$$r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}$$
 
 **The complexity comes from advantage estimation.** PPO typically uses Generalized Advantage Estimation (GAE), which requires:
 
