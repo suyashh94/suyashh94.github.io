@@ -8,6 +8,8 @@ author: Suyash Shringarpure
 image: /assets/img/posts/grpo/grpo_cover.png
 description: "An empirical study on GRPO training dynamics for vision-language models, exploring the tradeoffs between learning speed and cross-domain generalization when using guidance injection."
 math: true
+pin: true
+mermaid: true
 ---
 
 Reinforcement Learning from Human Feedback (RLHF) has revolutionized how we align large language models with human preferences. But what happens when we apply similar techniques to *vision-language* models? And more critically, what do we do when our base model cannot produce any reward signal at all?
