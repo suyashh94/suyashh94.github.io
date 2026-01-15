@@ -2,7 +2,7 @@
 layout: post
 title: "Breaking the Cold Start Barrier: How Guidance Injection Accelerates Reinforcement Learning in Vision-Language Models"
 date: 2026-01-14
-categories: [Experiments, Side Projects, From-Scratch Implementations]
+categories: [Side Projects, From-Scratch Implementations]
 tags: [GRPO, VLM, Qwen2-VL, RL fine-tuning, guidance injection, PPO]
 image: /assets/img/posts/grpo/grpo_cover.png
 description: "An empirical study on GRPO training dynamics for vision-language models, exploring the tradeoffs between learning speed and cross-domain generalization when using guidance injection."
@@ -375,10 +375,10 @@ The training curves reveal stark differences:
 
 On the training distribution, both approaches achieved similar final performance:
 
-| Approach | Steps to 90% | Final CLEVR Accuracy | Training Time |
-|----------|-------------|---------------------|---------------|
-| With Injection | ~600 | 93% | ~3 hours |
-| Without Injection | ~1,600 | 93% | ~8 hours |
+| Approach | Steps to 90% | Final CLEVR Accuracy | 
+|----------|-------------|---------------------
+| With Injection | ~600 | 93%  |
+| Without Injection | ~1,600 | 93% |
 
 For researchers with limited compute budgets, the **2.5x speedup** from injection is significant. If you only care about performance on a single domain, injection appears to be a clear win.
 
