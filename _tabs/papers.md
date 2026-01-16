@@ -110,7 +110,7 @@ order: 5
     {% endif %}
     
     <a href="{{ '/papers/' | append: paper.id | append: '/' | relative_url }}" class="read-guide-btn">
-      <i class="fas fa-book-open"></i> Read Guide
+      <i class="fas fa-book-open"></i> Read Summary
     </a>
   </div>
   {% endfor %}
