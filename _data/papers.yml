@@ -1,13 +1,6 @@
 - authors: ''
   date: '2026-01-16'
   has_guide: true
-  id: hipo.22824
-  one_sentence_summary: ''
-  paper_type: unknown
-  title: The content of hippocampal "replay"
-- authors: ''
-  date: '2026-01-16'
-  has_guide: true
   id: '2509.04903'
   one_sentence_summary: This paper introduces ACE-RL, a reinforcement learning framework
     that enhances long-form text generation in LLMs by converting subjective quality
