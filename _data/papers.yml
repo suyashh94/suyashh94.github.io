@@ -1,6 +1,16 @@
 - authors: ''
   date: '2026-01-16'
   has_guide: true
+  id: '2512.24880'
+  one_sentence_summary: This paper introduces Manifold-Constrained Hyper-Connections
+    (mHC), which projects residual connection matrices onto the Birkhoff polytope
+    using Sinkhorn-Knopp to restore identity mapping properties and enable stable
+    large-scale training of deep networks with expanded residual streams.
+  paper_type: methodology
+  title: 'mHC: Manifold-Constrained Hyper-Connections'
+- authors: ''
+  date: '2026-01-16'
+  has_guide: true
   id: '2509.04903'
   one_sentence_summary: This paper introduces ACE-RL, a reinforcement learning framework
     that enhances long-form text generation in LLMs by converting subjective quality
