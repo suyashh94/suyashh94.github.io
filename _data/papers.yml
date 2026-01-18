@@ -1,5 +1,15 @@
 - authors: ''
-  date: '2026-01-16'
+  date: '2026-01-18'
+  has_guide: true
+  id: '2406.11813'
+  one_sentence_summary: This paper investigates how LLMs acquire factual knowledge
+    during pretraining, revealing that knowledge acquisition occurs through micro-acquisitions
+    that accumulate with a power-law forgetting pattern, and demonstrating that larger
+    batch sizes and data deduplication enhance knowledge retention.
+  paper_type: empirical
+  title: How Do Large Language Models Acquire Factual Knowledge During Pretraining?
+- authors: ''
+  date: '2026-01-18'
   has_guide: true
   id: '2512.24880'
   one_sentence_summary: This paper introduces Manifold-Constrained Hyper-Connections
@@ -9,7 +19,7 @@
   paper_type: methodology
   title: 'mHC: Manifold-Constrained Hyper-Connections'
 - authors: ''
-  date: '2026-01-16'
+  date: '2026-01-18'
   has_guide: true
   id: '2509.04903'
   one_sentence_summary: This paper introduces ACE-RL, a reinforcement learning framework
@@ -19,7 +29,7 @@
   title: 'ACE-RL: Adaptive Constraint-Enhanced Reward for Long-form Generation Reinforcement
     Learning'
 - authors: ''
-  date: '2026-01-16'
+  date: '2026-01-18'
   has_guide: true
   id: '2601.08763'
   one_sentence_summary: This paper introduces Uniqueness-Aware Reinforcement Learning,
@@ -30,7 +40,7 @@
   title: 'Rewarding the Rare: Uniqueness-Aware RL for Creative Problem Solving in
     LLMs'
 - authors: ''
-  date: '2026-01-16'
+  date: '2026-01-18'
   has_guide: true
   id: '2601.05242'
   one_sentence_summary: This paper identifies that GRPO's reward normalization collapses
