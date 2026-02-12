@@ -1082,46 +1082,84 @@
         </div>
 
         <div class="info-box note">
-            <div class="info-box-title">Hyperparameters</div>
+            <div class="info-box-title">Training Configuration (Tables 3 &amp; 4)</div>
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+                        <tr><th>Parameter</th><th>Skill Learning</th><th>Knowledge Acquisition</th><th>Notes</th></tr>
                     </thead>
                     <tbody>
                         <tr>
+                            <td class="table-mono">base_model</td>
+                            <td class="table-mono" colspan="2">Qwen2.5-7B-Instruct</td>
+                            <td>Also tested 3B and 14B for scaling experiments</td>
+                        </tr>
+                        <tr>
                             <td class="table-mono">learning_rate</td>
+                            <td class="table-mono">{5e-6, 1e-5, 5e-5}</td>
                             <td class="table-mono">{5e-6, 1e-5, 5e-5}</td>
                             <td>Grid search; best varies by task</td>
                         </tr>
                         <tr>
                             <td class="table-mono">optimizer</td>
-                            <td class="table-mono">AdamW</td>
-                            <td>With cosine LR schedule and warmup</td>
+                            <td class="table-mono" colspan="2">AdamW</td>
+                            <td>No weight decay (weight_decay = 0)</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">lr_scheduler</td>
+                            <td class="table-mono" colspan="2">Cosine with warmup</td>
+                            <td>10 warmup steps for all experiments</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">epochs</td>
+                            <td class="table-mono">{1, 2}</td>
+                            <td class="table-mono">{1, 2, 4}</td>
+                            <td>SDFT benefits from multiple epochs (2 for skill, 4 for knowledge); SFT overfits after 1</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">batch_size</td>
+                            <td class="table-mono">{16, 32, 64}</td>
+                            <td class="table-mono">{16, 32, 64}</td>
+                            <td>Grid search; on a single H200 (80GB VRAM)</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">max_grad_norm</td>
+                            <td class="table-mono" colspan="2">1.0</td>
+                            <td>Gradient clipping applied uniformly</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">precision</td>
+                            <td class="table-mono" colspan="2">bfloat16</td>
+                            <td>Mixed precision throughout</td>
+                        </tr>
+                        <tr style="border-top: 2px solid var(--border);">
+                            <td colspan="4" style="font-weight: 600; padding-top: 8px;">SDFT-Specific</td>
                         </tr>
                         <tr>
                             <td class="table-mono">ema_alpha</td>
-                            <td class="table-mono">{0.01, 0.02, 0.05}</td>
-                            <td>EMA coefficient for teacher weight update; small values = slower teacher adaptation</td>
+                            <td class="table-mono" colspan="2">{0.01, 0.02, 0.05}</td>
+                            <td>EMA coefficient for teacher weight update; small values = slower teacher drift</td>
                         </tr>
                         <tr>
                             <td class="table-mono">max_generation_length</td>
                             <td class="table-mono">2048</td>
-                            <td>Max tokens for student-generated trajectories</td>
+                            <td class="table-mono">1024</td>
+                            <td>Max tokens for student on-policy rollouts</td>
+                        </tr>
+                        <tr>
+                            <td class="table-mono">rollouts_per_example</td>
+                            <td class="table-mono" colspan="2">1</td>
+                            <td>Single on-policy rollout per training example</td>
                         </tr>
                         <tr>
                             <td class="table-mono">num_seeds</td>
-                            <td class="table-mono">3</td>
+                            <td class="table-mono" colspan="2">3</td>
                             <td>All results averaged; 95% CI reported</td>
-                        </tr>
-                        <tr>
-                            <td class="table-mono">base_model</td>
-                            <td class="table-mono">Qwen2.5-7B-Instruct</td>
-                            <td>Primary experiments; also tested 3B and 14B</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <p style="margin-top: 8px; font-size: 0.9em; color: var(--text-secondary);"><strong>Note:</strong> The paper does not mention gradient accumulation. All experiments ran on a single NVIDIA H200 (80GB VRAM), which has enough memory to fit batch sizes up to 64 for 7B models without accumulation. For smaller GPUs, gradient accumulation is an engineering necessity not discussed in the paper.</p>
         </div>
 
         <div class="code-block">
@@ -1129,50 +1167,80 @@
         <span class="code-label">SDFT Training Loop (Python)</span>
     </div>
     <div class="code-content">
-        <pre># SDFT Training Loop
+        <pre># SDFT Training Loop (Algorithm 1 from the paper)
 import torch
+import torch.nn.functional as F
 from transformers import AutoModelForCausalLM
 from copy import deepcopy
 
-# Initialize
-student = AutoModelForCausalLM.from_pretrained(&#x27;Qwen/Qwen2.5-7B-Instruct&#x27;)
-teacher = deepcopy(student)  # Teacher starts as copy of student
-optimizer = torch.optim.AdamW(student.parameters(), lr=1e-5)
+# === Configuration (from Tables 3 &amp; 4) ===
+config = {
+    &quot;lr&quot;: 1e-5,             # from {5e-6, 1e-5, 5e-5}
+    &quot;batch_size&quot;: 32,       # from {16, 32, 64}
+    &quot;epochs&quot;: 2,            # skill: {1,2}, knowledge: {1,2,4}
+    &quot;ema_alpha&quot;: 0.02,      # from {0.01, 0.02, 0.05}
+    &quot;max_gen_length&quot;: 2048, # skill: 2048, knowledge: 1024
+    &quot;max_grad_norm&quot;: 1.0,   # gradient clipping (paper: 1.0)
+    &quot;warmup_steps&quot;: 10,     # cosine schedule with warmup
+    &quot;weight_decay&quot;: 0.0,    # no weight decay
+}
 
-# Prompt template
+# === Initialize ===
+student = AutoModelForCausalLM.from_pretrained(
+    &#x27;Qwen/Qwen2.5-7B-Instruct&#x27;, torch_dtype=torch.bfloat16
+)
+teacher = deepcopy(student)  # Teacher starts as exact copy
+optimizer = torch.optim.AdamW(
+    student.parameters(), lr=config[&quot;lr&quot;], weight_decay=config[&quot;weight_decay&quot;]
+)
+# + cosine LR scheduler with 10 warmup steps (omitted for clarity)
+
+# Prompt template (exact from Section 3)
 TEMPLATE = (
     &quot;{question}\n&quot;
-    &quot;This is an example for a response: {demo}\n&quot;
-    &quot;Now answer with a response of your own, including thinking process:&quot;
+    &quot;This is an example for a response to the question:\n&quot;
+    &quot;{demo}\n&quot;
+    &quot;Now answer with a response of your own, including the thinking process:&quot;
 )
 
-for step, (question, demo) in enumerate(dataloader):
-    # 1. Student generates on-policy trajectories (no demo)
-    with torch.no_grad():
-        student_outputs = student.generate(question, max_length=2048, do_sample=True)
-    
-    # 2. Teacher scores trajectories (with demo via ICL)
-    teacher_input = TEMPLATE.format(question=question, demo=demo)
-    with torch.no_grad():
-        teacher_logprobs = teacher.log_prob(student_outputs, context=teacher_input)
-    
-    # 3. Student computes its own log-probs on same trajectories
-    student_logprobs = student.log_prob(student_outputs, context=question)
-    
-    # 4. Reverse KL loss: D_KL(student || teacher)
-    # = E_student[log student - log teacher]
-    loss = (student_logprobs - teacher_logprobs).mean()
-    
-    # 5. Backprop and update student
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    
-    # 6. EMA update teacher
-    alpha = 0.02
-    with torch.no_grad():
-        for t_param, s_param in zip(teacher.parameters(), student.parameters()):
-            t_param.data = alpha * s_param.data + (1 - alpha) * t_param.data</pre>
+# === Training loop ===
+for epoch in range(config[&quot;epochs&quot;]):
+    for step, batch in enumerate(dataloader):  # batch_size from config
+        question, demo = batch[&quot;question&quot;], batch[&quot;demonstration&quot;]
+
+        # 1. Student generates on-policy (single rollout per example)
+        with torch.no_grad():
+            student_outputs = student.generate(
+                question, max_new_tokens=config[&quot;max_gen_length&quot;],
+                do_sample=True, temperature=1.0
+            )
+
+        # 2. Teacher scores same tokens (with demo via ICL)
+        teacher_input = TEMPLATE.format(question=question, demo=demo)
+        with torch.no_grad():
+            teacher_logits = teacher.forward(student_outputs, context=teacher_input)
+
+        # 3. Student scores same tokens (WITH grad)
+        student_logits = student.forward(student_outputs, context=question)
+
+        # 4. Full analytic reverse KL (sum over vocabulary at each position)
+        student_log_probs = F.log_softmax(student_logits, dim=-1)
+        teacher_log_probs = F.log_softmax(teacher_logits, dim=-1)
+        student_probs = student_log_probs.exp()
+        kl_per_token = (student_probs * (student_log_probs - teacher_log_probs)).sum(dim=-1)
+        loss = kl_per_token.mean()
+
+        # 5. Backprop with gradient clipping
+        optimizer.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(student.parameters(), config[&quot;max_grad_norm&quot;])
+        optimizer.step()
+
+        # 6. EMA update teacher (every optimizer step)
+        alpha = config[&quot;ema_alpha&quot;]
+        with torch.no_grad():
+            for t_p, s_p in zip(teacher.parameters(), student.parameters()):
+                t_p.data = alpha * s_p.data + (1 - alpha) * t_p.data</pre>
     </div>
 </div>
 

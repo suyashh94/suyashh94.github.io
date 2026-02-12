@@ -11,15 +11,6 @@
 - authors: ''
   date: '2026-02-12'
   has_guide: true
-  id: '2509.04259'
-  one_sentence_summary: When fine-tuning foundation models, RL forgets less than SFT
-    because on-policy RL is implicitly biased toward KL-minimal solutions, and KL
-    divergence on the new task reliably predicts the degree of catastrophic forgetting.
-  paper_type: empirical+theoretical
-  title: 'RL''s Razor: Why Online Reinforcement Learning Forgets Less'
-- authors: ''
-  date: '2026-02-12'
-  has_guide: true
   id: '2512.24880'
   one_sentence_summary: This paper introduces Manifold-Constrained Hyper-Connections
     (mHC), which projects residual connection matrices onto the Birkhoff polytope
@@ -37,6 +28,15 @@
     substantially reducing catastrophic forgetting compared to supervised fine-tuning.
   paper_type: methodology
   title: Self-Distillation Enables Continual Learning
+- authors: ''
+  date: '2026-02-12'
+  has_guide: true
+  id: '2601.05242'
+  one_sentence_summary: This paper identifies that GRPO's reward normalization collapses
+    distinct multi-reward combinations into identical advantages, and proposes GDPO
+    which decouples normalization per reward to preserve training signal granularity.
+  paper_type: methodology
+  title: 'GDPO: Group reward-Decoupled Normalization Policy Optimization'
 - authors: ''
   date: '2026-02-12'
   has_guide: true
@@ -61,9 +61,9 @@
 - authors: ''
   date: '2026-02-12'
   has_guide: true
-  id: '2601.05242'
-  one_sentence_summary: This paper identifies that GRPO's reward normalization collapses
-    distinct multi-reward combinations into identical advantages, and proposes GDPO
-    which decouples normalization per reward to preserve training signal granularity.
-  paper_type: methodology
-  title: 'GDPO: Group reward-Decoupled Normalization Policy Optimization'
+  id: '2509.04259'
+  one_sentence_summary: When fine-tuning foundation models, RL forgets less than SFT
+    because on-policy RL is implicitly biased toward KL-minimal solutions, and KL
+    divergence on the new task reliably predicts the degree of catastrophic forgetting.
+  paper_type: empirical+theoretical
+  title: 'RL''s Razor: Why Online Reinforcement Learning Forgets Less'
