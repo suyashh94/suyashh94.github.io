@@ -848,6 +848,7 @@
                     <li><a href="#insights">Insights & Connections</a></li>
                     <li><a href="#limitations">Limitations & Future Work</a></li>
                     <li><a href="#takeaways">Quotable Takeaways</a></li>
+                    <li style="margin-top:0.75rem; padding-top:0.5rem; border-top:1px solid var(--border-color);"><a href="#appendix-kl">Appendix: KL Divergence & GRPO</a></li>
                 </ul>
 
                 <div class="reader-paths">
@@ -2826,6 +2827,242 @@ def run_ablation(model, questions, demos):
     <div class="key-insight" style="margin-bottom: 1.5rem;">
         <div class="key-insight-label">Scaling results suggesting SDFT becomes more valuable over time</div>
         <p>SDFT advantage scales with model size: as models get bigger, the gap widens from -3.3 at 3B to +6.9 at 14B</p>
+    </div>
+
+</section>
+
+
+<section id="appendix-kl">
+    <span class="section-number">Appendix A</span>
+    <h2 class="section-title">Forward vs Reverse KL Divergence & GRPO</h2>
+
+    <p>KL divergence is central to SDFT's objective and to modern RLHF/GRPO training. This appendix unpacks the two directions of KL, how they're computed from model logits, and the practical approximation used in GRPO.</p>
+
+    <!-- ===== A.1 Forward vs Reverse KL ===== -->
+    <h3 class="subsection-title">A.1 &mdash; Forward vs Reverse KL Divergence</h3>
+
+    <p>KL divergence is <strong>asymmetric</strong>: \(\text{KL}(P \| Q) \neq \text{KL}(Q \| P)\). The two directions have fundamentally different optimization behaviors.</p>
+
+    <div class="equation-block">
+        <div class="equation">
+            \[\text{KL}(P \| Q) = \sum_x P(x) \left[\log P(x) - \log Q(x)\right]\]
+        </div>
+        <div class="equation-label">General KL divergence definition</div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:20%">Property</th>
+                    <th style="width:40%">Forward KL &mdash; \(\text{KL}(P \| Q)\)</th>
+                    <th style="width:40%">Reverse KL &mdash; \(\text{KL}(Q \| P)\)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Also called</strong></td>
+                    <td>Mean-seeking / moment projection</td>
+                    <td>Mode-seeking / information projection</td>
+                </tr>
+                <tr>
+                    <td><strong>Objective</strong></td>
+                    <td>Fit \(Q\) to cover all of \(P\)</td>
+                    <td>Fit \(Q\) to concentrate where \(P\) is high</td>
+                </tr>
+                <tr>
+                    <td><strong>Penalty</strong></td>
+                    <td>Heavy penalty when \(P(x) > 0\) but \(Q(x) \approx 0\)</td>
+                    <td>Heavy penalty when \(Q(x) > 0\) but \(P(x) \approx 0\)</td>
+                </tr>
+                <tr>
+                    <td><strong>Behavior</strong></td>
+                    <td>\(Q\) spreads out to cover all modes &rarr; <em>over-dispersed</em></td>
+                    <td>\(Q\) locks onto dominant mode(s) &rarr; <em>under-dispersed</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Typical use</strong></td>
+                    <td>Variational inference (ELBO)</td>
+                    <td>Policy optimization (RLHF, PPO, GRPO, <strong>SDFT</strong>)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="key-insight">
+        <div class="key-insight-label">Intuition</div>
+        <p><strong>Forward KL:</strong> \(Q\) tries to cover \(P\) everywhere &rarr; mean-seeking (over-dispersed). Like a security camera that must see every corner.</p>
+        <p><strong>Reverse KL:</strong> \(Q\) avoids placing mass where \(P\) is low &rarr; mode-seeking (under-dispersed). Like a spotlight that locks onto the brightest spot.</p>
+    </div>
+
+    <div data-depth="3">
+        <div class="info-box note">
+            <div class="info-box-title">Why SDFT uses reverse KL</div>
+            <p>SDFT minimizes \(\text{KL}(\pi_\text{student} \| \pi_\text{teacher})\) &mdash; the <strong>reverse KL</strong>. This is mode-seeking: the student concentrates on the high-probability outputs of the teacher rather than trying to cover the teacher's full distribution. This is exactly what you want when learning a skill &mdash; you want the student to produce confident, high-quality outputs, not hedge across all possibilities.</p>
+            <p>Crucially, SDFT computes this on <strong>student-generated</strong> (on-policy) samples, which the paper proves is equivalent to on-policy RL with an implicit reward.</p>
+        </div>
+    </div>
+
+    <!-- ===== A.2 From Logits to KL ===== -->
+    <h3 class="subsection-title">A.2 &mdash; From Logits to KL Divergence</h3>
+
+    <p>Language models output <strong>logits</strong> &mdash; raw unnormalized scores over the vocabulary at each token position. Here's the pipeline from logits to a KL loss term.</p>
+
+    <div data-depth="2">
+        <h4 style="font-size:1rem; margin:1.25rem 0 0.75rem 0; color:var(--accent-primary);">Step 1: Logits &rarr; Probabilities</h4>
+        <p>Apply softmax to convert logits \(z\) into a probability distribution:</p>
+        <div class="equation-block">
+            <div class="equation">
+                \[\pi_\theta(t_i \mid t_{&lt;i}) = \frac{e^{z_i}}{\sum_j e^{z_j}}\]
+            </div>
+            <div class="equation-label">Softmax over vocabulary at each position</div>
+        </div>
+        <p>In practice, work in log-space for numerical stability: <code style="background:var(--bg-code);color:#e0e0e0;padding:0.15rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;">log_probs = log_softmax(logits)</code></p>
+    </div>
+
+    <div data-depth="2">
+        <h4 style="font-size:1rem; margin:1.25rem 0 0.75rem 0; color:var(--accent-primary);">Step 2: Compute per-token KL</h4>
+        <p>Run the same input through both the current policy \(\pi_\theta\) and the reference policy \(\pi_\text{ref}\). The exact per-token KL sums over the full vocabulary:</p>
+        <div class="equation-block">
+            <div class="equation">
+                \[\text{KL}(\pi_\theta \| \pi_\text{ref}) = \sum_{v \in \mathcal{V}} \pi_\theta(v) \left[\log \pi_\theta(v) - \log \pi_\text{ref}(v)\right]\]
+            </div>
+            <div class="equation-label">Full KL over vocabulary (expensive)</div>
+        </div>
+        <p>In practice, since you're computing this along the tokens actually generated (not the full vocabulary), a <strong>simplified unbiased estimator</strong> is commonly used:</p>
+        <div class="equation-block">
+            <div class="equation">
+                \[\hat{\text{KL}}_t = \log \pi_\theta(t_i \mid t_{&lt;i}) - \log \pi_\text{ref}(t_i \mid t_{&lt;i})\]
+            </div>
+            <div class="equation-label">Single-sample KL estimator &mdash; just the log-prob difference at the sampled token</div>
+        </div>
+    </div>
+
+    <div data-depth="3">
+        <h4 style="font-size:1rem; margin:1.25rem 0 0.75rem 0; color:var(--accent-primary);">Step 3: Use in the loss (GRPO example)</h4>
+        <p>GRPO (Group Relative Policy Optimization) uses a reverse KL penalty \(\text{KL}(\pi_\theta \| \pi_\text{ref})\) &mdash; the same direction as PPO/RLHF. The objective roughly looks like:</p>
+        <div class="equation-block">
+            <div class="equation">
+                \[\mathcal{L} = -\mathbb{E}\left[\hat{A}_i \cdot \min\left(\frac{\pi_\theta}{\pi_\text{old}}, \text{clip}(\ldots)\right)\right] + \beta \cdot \text{KL}\]
+            </div>
+            <div class="equation-label">GRPO objective: clipped policy gradient + KL regularization toward reference</div>
+            <div class="equation-explanation">
+                <ul>
+                    <li>\(\hat{A}_i\) &mdash; advantage estimate (group-relative in GRPO)</li>
+                    <li>\(\pi_\text{old}\) &mdash; the policy that generated the rollouts</li>
+                    <li>\(\beta\) &mdash; coefficient controlling how strongly KL regularizes the policy toward \(\pi_\text{ref}\)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div data-depth="4">
+        <div class="code-block" style="background:var(--bg-code);border-radius:8px;padding:1.5rem;margin:1.5rem 0;overflow-x:auto;">
+            <div class="code-header" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#888;margin-bottom:0.75rem;">PYTHON &mdash; From logits to per-token KL</div>
+<pre style="color:#e0e0e0;font-family:'JetBrains Mono',monospace;font-size:0.85rem;line-height:1.7;margin:0;"><span style="color:#888;"># Forward pass through both models on the same tokens</span>
+logits_policy = policy_model(input_ids).logits
+logits_ref = ref_model(input_ids).logits
+
+<span style="color:#888;"># Convert to log-probabilities (numerically stable)</span>
+log_probs_policy = F.log_softmax(logits_policy, dim=-1)
+log_probs_ref = F.log_softmax(logits_ref, dim=-1)
+
+<span style="color:#888;"># Gather log-probs for the actual generated tokens</span>
+token_log_prob_policy = log_probs_policy.gather(
+    -1, generated_ids.unsqueeze(-1)
+).squeeze(-1)  <span style="color:#888;"># shape: (batch, seq_len)</span>
+token_log_prob_ref = log_probs_ref.gather(
+    -1, generated_ids.unsqueeze(-1)
+).squeeze(-1)
+
+<span style="color:#888;"># Per-token KL estimate (naive single-sample)</span>
+kl = token_log_prob_policy - token_log_prob_ref  <span style="color:#888;"># shape: (batch, seq_len)</span></pre>
+        </div>
+
+        <div class="info-box note">
+            <div class="info-box-title">Key insight</div>
+            <p>You don't need to sum over the full vocabulary &mdash; the single-sample estimator (log-prob difference at the sampled token) is an <strong>unbiased estimate</strong> of the KL and is much cheaper to compute.</p>
+        </div>
+    </div>
+
+    <!-- ===== A.3 Schulman's KL Approximation ===== -->
+    <h3 class="subsection-title">A.3 &mdash; Schulman's KL Approximation (used in GRPO)</h3>
+
+    <p>The GRPO paper and its implementations (TRL, DeepSeek-R1) use an improved KL approximation proposed by Schulman, sometimes called the <strong>k3 estimator</strong>:</p>
+
+    <div class="equation-block">
+        <div class="equation">
+            \[\hat{\text{KL}} = \frac{\pi_\text{ref}(t_i)}{\pi_\theta(t_i)} - \log \frac{\pi_\text{ref}(t_i)}{\pi_\theta(t_i)} - 1\]
+        </div>
+        <div class="equation-label">Schulman's KL approximation (ratio form)</div>
+    </div>
+
+    <div data-depth="3">
+        <p>Equivalently, letting \(r = \log \pi_\text{ref} - \log \pi_\theta\):</p>
+        <div class="equation-block">
+            <div class="equation">
+                \[\hat{\text{KL}} = e^{r} - r - 1\]
+            </div>
+            <div class="equation-label">Schulman's KL in log-ratio form &mdash; \(f(r) = e^r - r - 1\)</div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:35%">Property</th>
+                    <th style="width:30%">Naive estimator<br><small>\(\log \pi_\theta - \log \pi_\text{ref}\)</small></th>
+                    <th style="width:35%">Schulman (k3) estimator<br><small>\(e^r - r - 1\)</small></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Non-negativity</strong></td>
+                    <td>Can go negative for individual tokens</td>
+                    <td>Always \(\geq 0\) (since \(e^x - x - 1 \geq 0\) for all \(x\))</td>
+                </tr>
+                <tr>
+                    <td><strong>Zero when equal</strong></td>
+                    <td>Yes, when \(\pi_\theta = \pi_\text{ref}\)</td>
+                    <td>Yes, when \(\pi_\theta = \pi_\text{ref}\)</td>
+                </tr>
+                <tr>
+                    <td><strong>Variance</strong></td>
+                    <td>Can have high variance</td>
+                    <td>Lower variance, better behaved</td>
+                </tr>
+                <tr>
+                    <td><strong>Gradient behavior</strong></td>
+                    <td>Linear penalty</td>
+                    <td>Stronger gradients when policy drifts far from reference</td>
+                </tr>
+                <tr>
+                    <td><strong>Interpretation</strong></td>
+                    <td>First-order approximation</td>
+                    <td>Second-order approximation accounting for both KL directions</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div data-depth="4">
+        <div class="code-block" style="background:var(--bg-code);border-radius:8px;padding:1.5rem;margin:1.5rem 0;overflow-x:auto;">
+            <div class="code-header" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#888;margin-bottom:0.75rem;">PYTHON &mdash; Schulman's KL approximation (as used in DeepSeek-R1 / TRL GRPO)</div>
+<pre style="color:#e0e0e0;font-family:'JetBrains Mono',monospace;font-size:0.85rem;line-height:1.7;margin:0;"><span style="color:#888;"># Per-token log-prob ratio</span>
+log_ratio = log_probs_ref - log_probs_policy  <span style="color:#888;"># r = log π_ref - log π_θ</span>
+
+<span style="color:#888;"># Schulman's k3 estimator: always non-negative</span>
+kl = torch.exp(log_ratio) - log_ratio - 1     <span style="color:#888;"># e^r - r - 1 ≥ 0</span>
+
+<span style="color:#888;"># Average over tokens, then over batch</span>
+kl_loss = kl.mean()</pre>
+        </div>
+    </div>
+
+    <div class="key-insight">
+        <div class="key-insight-label">Connection to SDFT</div>
+        <p>While GRPO uses \(\text{KL}(\pi_\theta \| \pi_\text{ref})\) as a <strong>regularizer</strong> (preventing drift from the base model), SDFT uses reverse KL as the <strong>primary objective</strong> &mdash; minimizing \(\text{KL}(\pi_\text{student} \| \pi_\text{teacher})\) where the teacher is the same model conditioned on demonstrations. Both leverage reverse KL's mode-seeking property, but for different purposes: GRPO constrains exploration; SDFT drives skill acquisition from demonstrations without reward engineering.</p>
     </div>
 
 </section>
