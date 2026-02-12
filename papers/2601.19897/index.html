@@ -1252,7 +1252,7 @@ for epoch in range(config[&quot;epochs&quot;]):
             <div class="expandable-content">
                 <ul>
                     <li>The teacher prompt template matters: including &#x27;including thinking process&#x27; in the template significantly improves quality of teacher outputs by eliciting chain-of-thought reasoning.</li>
-                    <li>Monitor KL divergence between student and teacher during training. If it grows beyond ~1.5 nats, the EMA alpha may be too small (teacher is lagging too far behind).</li>
+                    <li>Monitor KL divergence between student and teacher during training. If it grows beyond ~1.5 nats, diagnose the cause: (a) EMA alpha too small &mdash; teacher lags behind student, increase alpha; (b) learning rate too high &mdash; student diverges or oscillates, reduce LR; (c) student not learning &mdash; loss plateaus while KL rises, check data quality and demo format; (d) genuinely novel knowledge &mdash; high KL from the start is expected, use conservative hyperparameters.</li>
                     <li>The method requires strong ICL capability in the base model. At 3B parameters, SDFT underperforms SFT (-3.3 points), so use models &gt;= 7B.</li>
                     <li>Watch for the student copying teacher artifacts like &#x27;Based on the text...&#x27; phrasing. Fix by masking the loss on the first few generated tokens.</li>
                     <li>Computational cost is ~2.5x FLOPs and ~4x wall-clock vs SFT due to on-policy generation, but this can replace multi-stage pipelines (SFT + RL), making total cost comparable.</li>
@@ -1645,7 +1645,7 @@ def validate_icl_assumption(model, eval_dataset, demos):
                     <li>Always run this validation BEFORE committing to SDFT training. It takes minutes and can save hours of wasted compute.</li>
                     <li>If base accuracy is already high (&gt;80%), SDFT may not help much because the implicit reward signal will be weak (teacher and student already agree).</li>
                     <li>If teacher accuracy is low (&lt;80%), do not use SDFT. Fall back to SFT with curated data or use a stronger model as an external teacher.</li>
-                    <li>The KL divergence check is a proxy for forgetting risk. If KL &gt; 1.5 nats, expect significant forgetting even with SDFT.</li>
+                    <li>The KL divergence check is a proxy for forgetting risk. High KL (&gt; 1.5 nats) before training suggests the teacher distribution is far from the student. For familiar knowledge this signals risk of forgetting; for genuinely novel knowledge, high KL is expected and can be handled with conservative hyperparameters (lower LR, smaller EMA alpha, more epochs).</li>
                     <li>Quality of demonstrations matters: use diverse, well-written examples. A single bad demo can make the teacher worse than the base model for that task.</li>
                 </ul>
             </div>
@@ -1660,7 +1660,7 @@ def validate_icl_assumption(model, eval_dataset, demos):
                 <ul>
                     <li><strong>ICL Assumption fails at small scale:</strong> SDFT underperforms SFT, especially on tasks requiring complex reasoning <em>Solution:</em> Use a model with &gt;= 7B parameters. At 3B, ICL capability is insufficient to create a good teacher.</li>
                     <li><strong>Demo quality is poor:</strong> Teacher accuracy with demo is lower than expected, or teacher outputs contain errors <em>Solution:</em> Curate demonstrations carefully. Use ground-truth or expert-verified examples. Test multiple demos and use the one that maximizes teacher accuracy.</li>
-                    <li><strong>KL divergence is too high:</strong> Teacher deviates &gt; 1.5 nats from student, SDFT causes forgetting comparable to SFT <em>Solution:</em> The demonstration may be too different from the model&#x27;s natural behavior. Try demonstrations that are closer to the model&#x27;s style or use a shorter demo.</li>
+                    <li><strong>KL divergence is too high:</strong> Teacher deviates &gt; 1.5 nats from student <em>Diagnosis:</em> Distinguish between (a) the demo is stylistically too different &mdash; try demonstrations closer to the model&#x27;s style, and (b) the knowledge is genuinely novel &mdash; high KL is expected, use conservative hyperparameters (lower LR, smaller EMA alpha, more epochs). Only (a) is a problem; (b) is normal for new knowledge injection.</li>
                     <li><strong>Teacher copies the demo:</strong> Teacher outputs contain verbatim phrases from the demonstration, student learns to parrot <em>Solution:</em> Manually inspect teacher traces. If copying is prevalent, use demos for different questions than the training questions (i.e., the demo should illustrate the format, not answer the specific question).</li>
                 </ul>
             </div>
@@ -2041,7 +2041,7 @@ def knowledge_acquisition_experiment(model, articles, eval_sets):
             </div>
             <div class="expandable-content">
                 <ul>
-                    <li><strong>Catastrophic forgetting despite using SDFT:</strong> Prior-task accuracy drops by &gt;5 points after learning a new task <em>Solution:</em> Check the ICL Assumption for the new task. If the teacher KL divergence is &gt;1.5 nats, the update is too aggressive. Consider using a more relevant demonstration or reducing the learning rate.</li>
+                    <li><strong>Catastrophic forgetting despite using SDFT:</strong> Prior-task accuracy drops by &gt;5 points after learning a new task <em>Solution:</em> Check the ICL Assumption for the new task. If teacher KL divergence is high, the update may be too aggressive. For novel knowledge (high KL is expected), use conservative hyperparameters: lower learning rate, smaller EMA alpha, more epochs. For familiar knowledge with high KL, the demonstration format may be the issue &mdash; try demos closer to the model&#x27;s natural style.</li>
                     <li><strong>Poor new-task performance:</strong> SDFT accuracy on the new task is lower than SFT <em>Solution:</em> Verify teacher accuracy with the demonstration. If &lt;80%, the demonstration quality is the bottleneck. Also check that the model size is &gt;= 7B.</li>
                     <li><strong>Knowledge not generalizing (low OOD):</strong> High strict accuracy but low OOD accuracy, suggesting memorization <em>Solution:</em> Use demonstrations that emphasize reasoning and context, not just facts. Include &#x27;thinking process&#x27; in the prompt template to encourage the teacher to show its reasoning.</li>
                     <li><strong>Evaluation contamination:</strong> Suspiciously high accuracy on knowledge acquisition tasks <em>Solution:</em> Verify that knowledge source (e.g., Wikipedia articles) genuinely post-dates the model&#x27;s training data cutoff. Use facts that are verifiably novel.</li>
