@@ -1,5 +1,5 @@
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
   has_guide: true
   id: '2406.11813'
   one_sentence_summary: This paper investigates how LLMs acquire factual knowledge
@@ -9,7 +9,7 @@
   paper_type: empirical
   title: How Do Large Language Models Acquire Factual Knowledge During Pretraining?
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
   has_guide: true
   id: '2509.04259'
   one_sentence_summary: When fine-tuning foundation models, RL forgets less than SFT
@@ -18,7 +18,7 @@
   paper_type: empirical+theoretical
   title: 'RL''s Razor: Why Online Reinforcement Learning Forgets Less'
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
   has_guide: true
   id: '2512.24880'
   one_sentence_summary: This paper introduces Manifold-Constrained Hyper-Connections
@@ -28,7 +28,17 @@
   paper_type: methodology
   title: 'mHC: Manifold-Constrained Hyper-Connections'
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
+  has_guide: true
+  id: '2601.19897'
+  one_sentence_summary: This paper introduces Self-Distillation Fine-Tuning (SDFT),
+    which enables on-policy learning from expert demonstrations by using a demonstration-conditioned
+    version of the same model as its own teacher, achieving new-task learning while
+    substantially reducing catastrophic forgetting compared to supervised fine-tuning.
+  paper_type: methodology
+  title: Self-Distillation Enables Continual Learning
+- authors: ''
+  date: '2026-02-12'
   has_guide: true
   id: '2509.04903'
   one_sentence_summary: This paper introduces ACE-RL, a reinforcement learning framework
@@ -38,7 +48,7 @@
   title: 'ACE-RL: Adaptive Constraint-Enhanced Reward for Long-form Generation Reinforcement
     Learning'
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
   has_guide: true
   id: '2601.08763'
   one_sentence_summary: This paper introduces Uniqueness-Aware Reinforcement Learning,
@@ -49,7 +59,7 @@
   title: 'Rewarding the Rare: Uniqueness-Aware RL for Creative Problem Solving in
     LLMs'
 - authors: ''
-  date: '2026-02-02'
+  date: '2026-02-12'
   has_guide: true
   id: '2601.05242'
   one_sentence_summary: This paper identifies that GRPO's reward normalization collapses
