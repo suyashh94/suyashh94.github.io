@@ -1026,8 +1026,8 @@
 
     <div data-depth="3">
         <h3 class="subsection-title">Technical Details</h3>
-        <p>SDFT defines two distributions from the same model. The teacher distribution pi(y|x,c) is obtained by conditioning the model on both the query x and a demonstration c, provided through in-context learning via a structured prompt template: '<Question> This is an example for a response: <Demo> Now answer with a response of your own, including thinking process:'. The student distribution pi_theta(y|x) is the model conditioned only on the query.</p>
-<p>Training minimizes the reverse KL divergence between student and teacher. The reverse direction is chosen deliberately: D_KL(pi_theta(y|x) || pi(y|x,c)) forces the student to be mode-seeking, concentrating its probability mass on the teacher's high-probability outputs rather than trying to cover all of the teacher's modes. This is standard in variational inference and avoids the student spreading itself too thin.</p>
+        <p>SDFT defines two distributions from the same model. The teacher distribution \(\pi(y|x,c)\) is obtained by conditioning the model on both the query \(x\) and a demonstration \(c\), provided through in-context learning via a structured prompt template: &lsquo;&lt;Question&gt; This is an example for a response: &lt;Demo&gt; Now answer with a response of your own, including thinking process:&rsquo;. The student distribution \(\pi_\theta(y|x)\) is the model conditioned only on the query.</p>
+<p>Training minimizes the reverse KL divergence between student and teacher. The reverse direction is chosen deliberately: \(D_\text{KL}(\pi_\theta(y|x) \| \pi(y|x,c))\) forces the student to be mode-seeking, concentrating its probability mass on the teacher's high-probability outputs rather than trying to cover all of the teacher's modes. This is standard in variational inference and avoids the student spreading itself too thin.</p>
 <p>To stabilize training, the teacher's weights are updated as an exponential moving average (EMA) of the student's weights rather than being frozen. This means the teacher co-evolves with the student, preventing a growing gap between the two that could destabilize gradients.</p>
 <p>The training is on-policy: at each step, the student generates its own trajectories (completions), and the loss is computed on those trajectories. This is critical because it means the student is always receiving feedback on the outputs it would actually produce, not on pre-generated data that may be far from its current distribution.</p>
 <p>Compared to standard SFT, which directly maximizes log-likelihood of teacher-generated outputs, SDFT has two key structural advantages for continual learning. First, the KL objective penalizes deviation from the teacher rather than forcing exact imitation, allowing the student to retain its own style and prior knowledge. Second, the teacher is only a gentle perturbation of the student (empirically 0.68 nats divergence vs. 1.26 nats for SFT targets from the base model, as shown in Section 3.2), so the gradient signal does not push the student far from its current state.</p>
@@ -1037,13 +1037,24 @@
 <div class="equation-block">
     <div class="equation">\[ \mathcal{L}_{\text{SDFT}} = D_{KL}(\pi_\theta(\cdot|x) \| \pi(\cdot|x,c)) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>pi_theta</code>: Student distribution, model conditioned only on query x</li> <li><code>pi(.|x,c)</code>: Teacher distribution, same model conditioned on query x and demonstration c</li> <li><code>x</code>: Input query</li> <li><code>c</code>: Demonstration (example answer provided via in-context learning)</li> <li><code>D_KL</code>: Reverse KL divergence (student || teacher)</li> </ul></p>
+        <ul>
+            <li>\(\pi_\theta\): Student distribution, model conditioned only on query \(x\)</li>
+            <li>\(\pi(\cdot|x,c)\): Teacher distribution, same model conditioned on query \(x\) and demonstration \(c\)</li>
+            <li>\(x\): Input query</li>
+            <li>\(c\): Demonstration (example answer provided via in-context learning)</li>
+            <li>\(D_\text{KL}\): Reverse KL divergence (student \(\|\) teacher)</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \theta_{\text{teacher}}^{(t+1)} = \alpha \cdot \theta_{\text{student}}^{(t)} + (1-\alpha) \cdot \theta_{\text{teacher}}^{(t)} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>theta_teacher</code>: Teacher model weights</li> <li><code>theta_student</code>: Student model weights</li> <li><code>alpha</code>: EMA coefficient (in {0.01, 0.02, 0.05})</li> <li><code>t</code>: Training step index</li> </ul></p>
+        <ul>
+            <li>\(\theta_\text{teacher}\): Teacher model weights</li>
+            <li>\(\theta_\text{student}\): Student model weights</li>
+            <li>\(\alpha\): EMA coefficient (in \(\{0.01, 0.02, 0.05\}\))</li>
+            <li>\(t\): Training step index</li>
+        </ul>
     </div>
 </div>
 
@@ -1211,8 +1222,8 @@ for step, (question, demo) in enumerate(dataloader):
 
     <div data-depth="2">
         <p>Reinforcement learning for language models typically requires someone (a human or another model) to assign explicit scores to outputs. SDFT avoids this entirely. The paper proves that the self-distillation process is secretly doing RL, with the reward signal hiding in plain sight.</p>
-<p>The implicit reward for any output is simply the log-probability difference between the teacher (model with example) and the current student (model without example). If the teacher thinks an output is much more likely than the student does, that output gets a high reward, meaning it is exactly the kind of output the example was meant to teach. If teacher and student already agree, the reward is near zero, meaning there is nothing new to learn from this output.</p>
-<p>This is like learning to cook by comparing your dish to a reference recipe. You do not need a food critic (explicit reward model). The gap between 'what the recipe produces' and 'what you currently produce' is itself the feedback. The bigger the gap for a particular technique, the more you need to practice it.</p>
+<p>The implicit reward for any output is simply the log-probability difference between the teacher (model with example) and the current student (model without example). If the teacher thinks an output is much more likely than the student does, that output gets a high reward &mdash; meaning it is exactly the kind of output the example was meant to teach. If teacher and student already agree, the reward is near zero &mdash; meaning there is nothing new to learn from this output.</p>
+<p>This is like learning to cook by comparing your dish to a reference recipe. You do not need a food critic (explicit reward model). The gap between &ldquo;what the recipe produces&rdquo; and &ldquo;what you currently produce&rdquo; is itself the feedback. The bigger the gap for a particular technique, the more you need to practice it.</p>
 <p>The theoretical connection runs through trust-region policy optimization. Each SDFT update corresponds to one step of constrained policy improvement, where the constraint ensures the model does not change too much in a single step. This is why SDFT naturally avoids catastrophic forgetting: it is structurally identical to conservative policy updates in RL, which are specifically designed to prevent drastic behavioral changes.</p>
 
         <div class="info-box insight">
@@ -1228,42 +1239,67 @@ for step, (question, demo) in enumerate(dataloader):
 
     <div data-depth="3">
         <h3 class="subsection-title">Technical Details</h3>
-        <p>The IRL interpretation begins from the trust-region RL objective. At iteration k, the next policy is obtained by solving a constrained optimization problem that maximizes expected reward while staying close to the current policy.</p>
-<p>The optimal solution to this problem has a known closed form: the next policy is proportional to the current policy re-weighted by exponentiated rewards. By taking the logarithm and rearranging, one can extract the implicit reward as the log-ratio of the optimal next policy to the current policy, scaled by the inverse temperature beta.</p>
-<p>The central theoretical move is what the authors call the ICL Assumption: the teacher distribution pi(y|x,c), obtained by conditioning the model on the demonstration, approximates the optimal next policy pi*_{k+1}(y|x). Under this assumption, the implicit reward becomes r(y,x,c) = log pi(y|x,c) - log pi_k(y|x), which is simply the log-probability ratio between teacher and student.</p>
-<p>This reward decomposes at the token level. For each token y_t in a sequence, the per-token reward is r_t = log pi(y_t|y_{<t},x,c) - log pi_k(y_t|y_{<t},x). This is semantically meaningful: tokens where the teacher strongly disagrees with the student receive larger rewards, focusing learning on the specific behaviors the demonstration is meant to teach.</p>
-<p>The policy gradient under this formulation takes the REINFORCE form, where the reward-weighted gradient of the student's log-probability drives the update. The authors show that this is algebraically equivalent to the gradient of the reverse KL divergence D_KL(pi_theta || pi(.|x,c)), establishing that minimizing reverse KL is identical to on-policy RL with the implicit reward.</p>
+        <p>The IRL interpretation begins from the trust-region RL objective. At iteration \(k\), the next policy is obtained by solving a constrained optimization problem that maximizes expected reward while staying close to the current policy.</p>
+<p>The optimal solution to this problem has a known closed form: the next policy is proportional to the current policy re-weighted by exponentiated rewards. By taking the logarithm and rearranging, one can extract the implicit reward as the log-ratio of the optimal next policy to the current policy, scaled by the inverse temperature \(\beta\).</p>
+<p>The central theoretical move is what the authors call the <strong>ICL Assumption</strong>: the teacher distribution \(\pi(y|x,c)\), obtained by conditioning the model on the demonstration, approximates the optimal next policy \(\pi^*_{k+1}(y|x)\). Under this assumption, the implicit reward becomes \(r(y,x,c) = \log \pi(y|x,c) - \log \pi_k(y|x)\), which is simply the log-probability ratio between teacher and student.</p>
+<p>This reward decomposes at the token level. For each token \(y_t\) in a sequence, the per-token reward is \(r_t = \log \pi(y_t|y_{&lt;t},x,c) - \log \pi_k(y_t|y_{&lt;t},x)\). This is semantically meaningful: tokens where the teacher strongly disagrees with the student receive larger rewards, focusing learning on the specific behaviors the demonstration is meant to teach.</p>
+<p>The policy gradient under this formulation takes the REINFORCE form, where the reward-weighted gradient of the student's log-probability drives the update. The authors show that this is algebraically equivalent to the gradient of the reverse KL divergence \(D_\text{KL}(\pi_\theta \| \pi(\cdot|x,c))\), establishing that minimizing reverse KL is identical to on-policy RL with the implicit reward.</p>
 <p>This equivalence has several important implications. First, it explains why on-policy sampling is crucial: the policy gradient estimator requires expectations under the current policy, not an old one. Second, it explains why SDFT outperforms offline distillation: offline methods use stale trajectories, introducing bias in the gradient estimator. Third, the trust-region structure (KL constraint) explains the natural continual learning properties, since the policy changes conservatively at each step.</p>
 <p>The connection to inverse RL is that rewards are not given but inferred from the teacher's behavior. The teacher's demonstration implicitly defines what good behavior looks like, and the log-ratio extracts a reward signal that captures exactly how the student should change. This is complementary to standard RL approaches: RL requires explicit rewards but allows arbitrary optimization, while SDFT requires only demonstrations but derives rewards automatically.</p>
 
 <div class="equation-block">
     <div class="equation">\[ \pi_{k+1} = \arg\max_{\pi} \mathbb{E}_{\pi}[r(y,x)] - \beta D_{KL}(\pi \| \pi_k) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>pi_{k+1}</code>: Next policy to be learned</li> <li><code>pi_k</code>: Current policy (anchor)</li> <li><code>r(y,x)</code>: Reward for output y given input x</li> <li><code>beta</code>: KL penalty coefficient (inverse temperature)</li> <li><code>D_KL</code>: KL divergence constraining policy change</li> </ul></p>
+        <ul>
+            <li>\(\pi_{k+1}\): Next policy to be learned</li>
+            <li>\(\pi_k\): Current policy (anchor)</li>
+            <li>\(r(y,x)\): Reward for output \(y\) given input \(x\)</li>
+            <li>\(\beta\): KL penalty coefficient (inverse temperature)</li>
+            <li>\(D_\text{KL}\): KL divergence constraining policy change</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \pi^*_{k+1}(y|x) \propto \pi_k(y|x) \exp\left(\frac{1}{\beta} r(y,x)\right) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>pi*_{k+1}</code>: Optimal solution to trust-region problem</li> <li><code>pi_k(y|x)</code>: Current policy probability of y given x</li> <li><code>exp(r/beta)</code>: Exponential re-weighting by reward, temperature-scaled</li> </ul></p>
+        <ul>
+            <li>\(\pi^*_{k+1}\): Optimal solution to trust-region problem</li>
+            <li>\(\pi_k(y|x)\): Current policy probability of \(y\) given \(x\)</li>
+            <li>\(\exp(r/\beta)\): Exponential re-weighting by reward, temperature-scaled</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ r(y,x,c) = \log \pi(y|x,c) - \log \pi_k(y|x) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>r(y,x,c)</code>: Implicit reward, derived by rearranging the optimal policy</li> <li><code>log pi(y|x,c)</code>: Teacher log-probability (model with demonstration)</li> <li><code>log pi_k(y|x)</code>: Student log-probability (model without demonstration)</li> </ul></p>
+        <ul>
+            <li>\(r(y,x,c)\): Implicit reward, derived by rearranging the optimal policy</li>
+            <li>\(\log \pi(y|x,c)\): Teacher log-probability (model with demonstration)</li>
+            <li>\(\log \pi_k(y|x)\): Student log-probability (model without demonstration)</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
-    <div class="equation">\[ r_t = \log \pi(y_t|y_{<t},x,c) - \log \pi_k(y_t|y_{<t},x) \]</div>
+    <div class="equation">\[ r_t = \log \pi(y_t|y_{&lt;t},x,c) - \log \pi_k(y_t|y_{&lt;t},x) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>r_t</code>: Per-token implicit reward at position t</li> <li><code>y_t</code>: Token at position t</li> <li><code>y_{&lt;t}</code>: All preceding tokens</li> <li><code>pi(y_t|y_{&lt;t},x,c)</code>: Teacher&#x27;s probability of token t given context and demo</li> <li><code>pi_k(y_t|y_{&lt;t},x)</code>: Student&#x27;s probability of token t given context only</li> </ul></p>
+        <ul>
+            <li>\(r_t\): Per-token implicit reward at position \(t\)</li>
+            <li>\(y_t\): Token at position \(t\)</li>
+            <li>\(y_{&lt;t}\): All preceding tokens</li>
+            <li>\(\pi(y_t|y_{&lt;t},x,c)\): Teacher's probability of token \(t\) given context and demo</li>
+            <li>\(\pi_k(y_t|y_{&lt;t},x)\): Student's probability of token \(t\) given context only</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \nabla J = \mathbb{E}_{\pi_k}\left[r(y,x,c) \nabla \log \pi_k(y|x)\right] = \mathbb{E}_{\pi_k}\left[\log\frac{\pi(y|x,c)}{\pi_k(y|x)} \nabla \log \pi_k(y|x)\right] \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>nabla J</code>: Policy gradient of the objective</li> <li><code>E_{pi_k}</code>: Expectation under current student policy (on-policy)</li> <li><code>r(y,x,c)</code>: Implicit reward (teacher-student log ratio)</li> <li><code>nabla log pi_k(y|x)</code>: Score function (gradient of log-probability)</li> </ul></p>
+        <ul>
+            <li>\(\nabla J\): Policy gradient of the objective</li>
+            <li>\(\mathbb{E}_{\pi_k}\): Expectation under current student policy (on-policy)</li>
+            <li>\(r(y,x,c)\): Implicit reward (teacher-student log ratio)</li>
+            <li>\(\nabla \log \pi_k(y|x)\): Score function (gradient of log-probability)</li>
+        </ul>
     </div>
 </div>
 
@@ -1403,25 +1439,32 @@ def sdft_as_rl_step(student, teacher, question, demo):
 
     <div data-depth="3">
         <h3 class="subsection-title">Technical Details</h3>
-        <p>The ICL Assumption formally states that pi(y|x,c) approximately equals pi<em>_{k+1}(y|x), where pi(y|x,c) is the teacher's output distribution conditioned on query x and demonstration c, and pi</em>_{k+1}(y|x) is the optimal next policy under the trust-region RL formulation.</p>
+        <p>The ICL Assumption formally states that \(\pi(y|x,c) \approx \pi^*_{k+1}(y|x)\), where \(\pi(y|x,c)\) is the teacher's output distribution conditioned on query \(x\) and demonstration \(c\), and \(\pi^*_{k+1}(y|x)\) is the optimal next policy under the trust-region RL formulation.</p>
 <p>For this approximation to hold, two conditions must be satisfied simultaneously:</p>
-<p>Condition 1 (Optimality): The teacher must achieve near-maximal reward. Formally, E[r(y,x)] where y is sampled from pi(y|x,c) should be close to max_pi E[r(y,x)]. The authors validate this on ToolAlpaca: the base Qwen2.5-7B-Instruct model achieves 42% accuracy without demonstrations, but pi(y|x,c) with a single demonstration achieves 100%, demonstrating that ICL effectively closes the performance gap to the optimal policy.</p>
-<p>Condition 2 (Minimal Deviation): The teacher must remain close to the current student in distribution space. Formally, D_KL(pi(y|x,c) || pi_k(y|x)) must be small relative to the trust-region constraint. The authors measure this empirically and find D_KL = 0.68 nats between teacher and base model, compared to D_KL = 1.26 nats between SFT targets and the base model. The teacher is nearly half the distributional distance from the base model compared to standard fine-tuning targets.</p>
-<p>This dual condition has a geometric interpretation. In policy space, the optimal next policy pi<em>_{k+1} lies within the trust region around the current policy pi_k. The ICL Assumption says that pi(y|x,c) also lies within (or very near) this trust region. If the teacher were too far away (high KL), the trust-region constraint would be violated, and the SDFT update would overshoot, potentially causing catastrophic forgetting.</p>
+<p><strong>Condition 1 (Optimality):</strong> The teacher must achieve near-maximal reward. Formally, \(\mathbb{E}[r(y,x)]\) where \(y\) is sampled from \(\pi(y|x,c)\) should be close to \(\max_\pi \mathbb{E}[r(y,x)]\). The authors validate this on ToolAlpaca: the base Qwen2.5-7B-Instruct model achieves 42% accuracy without demonstrations, but \(\pi(y|x,c)\) with a single demonstration achieves 100%, demonstrating that ICL effectively closes the performance gap to the optimal policy.</p>
+<p><strong>Condition 2 (Minimal Deviation):</strong> The teacher must remain close to the current student in distribution space. Formally, \(D_\text{KL}(\pi(y|x,c) \| \pi_k(y|x))\) must be small relative to the trust-region constraint. The authors measure this empirically and find \(D_\text{KL} = 0.68\) nats between teacher and base model, compared to \(D_\text{KL} = 1.26\) nats between SFT targets and the base model. The teacher is nearly half the distributional distance from the base model compared to standard fine-tuning targets.</p>
+<p>This dual condition has a geometric interpretation. In policy space, the optimal next policy \(\pi^*_{k+1}\) lies within the trust region around the current policy \(\pi_k\). The ICL Assumption says that \(\pi(y|x,c)\) also lies within (or very near) this trust region. If the teacher were too far away (high KL), the trust-region constraint would be violated, and the SDFT update would overshoot, potentially causing catastrophic forgetting.</p>
 <p>The authors also address a potential concern: is the teacher simply copying the demonstration? Manual inspection of 50 traces shows that the teacher produces valid, original reasoning that is informed by but not copied from the demonstration. This is important because rote copying would not transfer generalizable knowledge to the student.</p>
-<p>The assumption has known failure modes. At 3B parameters, where in-context learning capability is weaker, SDFT underperforms SFT by 3.3 points (Table 4). This directly corresponds to the Optimality condition failing: the smaller model cannot effectively leverage the demonstration, so pi(y|x,c) is a poor approximation of pi</em>_{k+1}. However, the assumption strengthens with scale: at 7B the gap is +4.0 in favor of SDFT, and at 14B it grows to +6.9, consistent with the well-documented scaling of ICL capabilities.</p>
+<p>The assumption has known failure modes. At 3B parameters, where in-context learning capability is weaker, SDFT underperforms SFT by 3.3 points (Table 4). This directly corresponds to the Optimality condition failing: the smaller model cannot effectively leverage the demonstration, so \(\pi(y|x,c)\) is a poor approximation of \(\pi^*_{k+1}\). However, the assumption strengthens with scale: at 7B the gap is +4.0 in favor of SDFT, and at 14B it grows to +6.9, consistent with the well-documented scaling of ICL capabilities.</p>
 <p>The validation approach itself is notable methodologically. Rather than assuming ICL works and hoping for the best, the authors provide concrete, falsifiable tests for both conditions. This allows practitioners to check whether SDFT is appropriate for their specific model and task before committing to the full training pipeline.</p>
 
 <div class="equation-block">
     <div class="equation">\[ \pi(y|x,c) \approx \pi^*_{k+1}(y|x) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>pi(y|x,c)</code>: Teacher distribution (model conditioned on query and demonstration)</li> <li><code>pi*_{k+1}(y|x)</code>: Optimal next policy under trust-region RL</li> <li><code>approx</code>: The ICL Assumption: demo-conditioned model approximates the optimal update</li> </ul></p>
+        <ul>
+            <li>\(\pi(y|x,c)\): Teacher distribution (model conditioned on query and demonstration)</li>
+            <li>\(\pi^*_{k+1}(y|x)\): Optimal next policy under trust-region RL</li>
+            <li>\(\approx\): The ICL Assumption &mdash; demo-conditioned model approximates the optimal update</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ D_{KL}(\pi(\cdot|x,c) \| \pi_k(\cdot|x)) = 0.68 \text{ nats} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>D_KL</code>: KL divergence measuring distributional distance</li> <li><code>0.68 nats</code>: Empirical teacher-student divergence (vs. 1.26 nats for SFT)</li> </ul></p>
+        <ul>
+            <li>\(D_\text{KL}\): KL divergence measuring distributional distance</li>
+            <li>\(0.68\) nats: Empirical teacher-student divergence (vs. 1.26 nats for SFT)</li>
+        </ul>
     </div>
 </div>
 
@@ -1787,7 +1830,10 @@ def validate_icl_assumption(model, eval_dataset, demos):
 <div class="equation-block">
     <div class="equation">\[ \text{Retention} = \frac{\text{Acc}_{\text{prior tasks after learning new task}}}{\text{Acc}_{\text{prior tasks before learning new task}}} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>Retention</code>: Ratio measuring how much prior-task performance is preserved</li> <li><code>Acc_prior</code>: Accuracy on previously learned tasks</li> </ul></p>
+        <ul>
+            <li>\(\text{Retention}\): Ratio measuring how much prior-task performance is preserved</li>
+            <li>\(\text{Acc}_\text{prior}\): Accuracy on previously learned tasks</li>
+        </ul>
     </div>
 </div>
 
@@ -2047,7 +2093,7 @@ def knowledge_acquisition_experiment(model, articles, eval_sets):
         <h3 class="subsection-title">Technical Details</h3>
         <p><strong>Scaling Experiments (Table 4)</strong></p>
 <p>The authors evaluate SDFT versus SFT across three model sizes in the Qwen2.5-Instruct family: 3B, 7B, and 14B parameters. The metric is the accuracy gap (SDFT minus SFT) on new-task performance averaged across the skill learning tasks.</p>
-<p>At 3B parameters, SDFT underperforms SFT by 3.3 points. This is a principled failure: 3B models have limited in-context learning capability, so the teacher pi(y|x,c) does not significantly outperform the student pi_theta(y|x). The ICL Assumption's Optimality condition is violated. At 7B, SDFT leads by +4.0 points, and at 14B by +6.9 points. The monotonically increasing gap directly tracks the well-documented scaling of ICL ability with model size.</p>
+<p>At 3B parameters, SDFT underperforms SFT by 3.3 points. This is a principled failure: 3B models have limited in-context learning capability, so the teacher \(\pi(y|x,c)\) does not significantly outperform the student \(\pi_\theta(y|x)\). The ICL Assumption's Optimality condition is violated. At 7B, SDFT leads by +4.0 points, and at 14B by +6.9 points. The monotonically increasing gap directly tracks the well-documented scaling of ICL ability with model size.</p>
 <p>This scaling behavior has important theoretical implications. It suggests that SDFT will become increasingly dominant as foundation models continue to scale. The method's reliance on ICL, often seen as a limitation, is actually a strength that converts model scale directly into better continual learning.</p>
 <p><strong>Reasoning Model Experiments (Table 5 and Figure 7)</strong></p>
 <p>The authors test SDFT on Olmo-3-7B-Think, a model specifically trained to produce extended chains of thought before answering. This is a particularly sensitive test case because reasoning models have a fragile internal structure: the long thinking chains are a learned behavior that can be easily disrupted.</p>
@@ -2060,13 +2106,21 @@ def knowledge_acquisition_experiment(model, articles, eval_sets):
 <div class="equation-block">
     <div class="equation">\[ \Delta_{\text{SDFT-SFT}}(N) = \text{Acc}_{\text{SDFT}}(N) - \text{Acc}_{\text{SFT}}(N) \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>Delta</code>: Accuracy gap between SDFT and SFT</li> <li><code>N</code>: Model size in parameters</li> <li><code>Acc</code>: Task accuracy (averaged across skill learning tasks)</li> </ul></p>
+        <ul>
+            <li>\(\Delta\): Accuracy gap between SDFT and SFT</li>
+            <li>\(N\): Model size in parameters</li>
+            <li>\(\text{Acc}\): Task accuracy (averaged across skill learning tasks)</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \Delta(3B) = -3.3, \quad \Delta(7B) = +4.0, \quad \Delta(14B) = +6.9 \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>-3.3</code>: SDFT underperforms at 3B (weak ICL)</li> <li><code>+4.0</code>: SDFT advantage at 7B</li> <li><code>+6.9</code>: SDFT advantage at 14B (strong ICL enables better self-distillation)</li> </ul></p>
+        <ul>
+            <li>\(-3.3\): SDFT underperforms at 3B (weak ICL)</li>
+            <li>\(+4.0\): SDFT advantage at 7B</li>
+            <li>\(+6.9\): SDFT advantage at 14B (strong ICL enables better self-distillation)</li>
+        </ul>
     </div>
 </div>
 
@@ -2366,10 +2420,10 @@ def reasoning_experiment():
     <div data-depth="3">
         <h3 class="subsection-title">Technical Details</h3>
         <p>The ablation study in Figure 6 systematically decomposes SDFT into its constituent components by testing three training variants on the same tasks:</p>
-<p><strong>Variant 1: SFT from Teacher</strong> (neither distillation objective nor on-policy sampling) The teacher generates outputs using pi(y|x,c), and the student is trained to maximize log-likelihood of these fixed outputs: L_SFT = -E[log pi_theta(y|x)] where y is sampled from the teacher. This is standard SFT, just using teacher-generated data instead of human-written data.</p>
-<p><strong>Variant 2: Offline Distillation</strong> (distillation objective, but not on-policy) The teacher pre-generates outputs, and the student trains on the KL divergence between its own distribution and the teacher's, but evaluated on the teacher's pre-generated trajectories rather than the student's own: L_offline = D_KL(pi_theta(y|x) || pi(y|x,c)) evaluated on y sampled from pi(y|x,c). This uses the softer distillation objective but the trajectories come from the teacher's (possibly outdated or irrelevant) behavior.</p>
-<p><strong>Variant 3: On-Policy SDFT</strong> (both distillation objective and on-policy sampling) The full method where the student generates its own trajectories and the KL divergence is computed on these student-generated outputs: L_SDFT = D_KL(pi_theta(y|x) || pi(y|x,c)) evaluated on y sampled from pi_theta(y|x).</p>
-<p>The theoretical basis for why on-policy matters comes from the IRL interpretation. The policy gradient is an expectation under the current policy: nabla J = E_{pi_k}[r(y,x,c) nabla log pi_k(y|x)]. When this expectation is estimated using samples from pi_k (on-policy), the gradient estimator is unbiased. When samples come from a different distribution (the teacher, in offline mode), the estimator is biased. This bias can point the gradient in the wrong direction, especially when the student and teacher distributions have diverged.</p>
+<p><strong>Variant 1: SFT from Teacher</strong> (neither distillation objective nor on-policy sampling) &mdash; The teacher generates outputs using \(\pi(y|x,c)\), and the student is trained to maximize log-likelihood of these fixed outputs: \(\mathcal{L}_\text{SFT} = -\mathbb{E}[\log \pi_\theta(y|x)]\) where \(y\) is sampled from the teacher. This is standard SFT, just using teacher-generated data instead of human-written data.</p>
+<p><strong>Variant 2: Offline Distillation</strong> (distillation objective, but not on-policy) &mdash; The teacher pre-generates outputs, and the student trains on the KL divergence between its own distribution and the teacher's, but evaluated on the teacher's pre-generated trajectories rather than the student's own: \(\mathcal{L}_\text{offline} = D_\text{KL}(\pi_\theta(y|x) \| \pi(y|x,c))\) evaluated on \(y \sim \pi(\cdot|x,c)\). This uses the softer distillation objective but the trajectories come from the teacher's (possibly outdated or irrelevant) behavior.</p>
+<p><strong>Variant 3: On-Policy SDFT</strong> (both distillation objective and on-policy sampling) &mdash; The full method where the student generates its own trajectories and the KL divergence is computed on these student-generated outputs: \(\mathcal{L}_\text{SDFT} = D_\text{KL}(\pi_\theta(y|x) \| \pi(y|x,c))\) evaluated on \(y \sim \pi_\theta(\cdot|x)\).</p>
+<p>The theoretical basis for why on-policy matters comes from the IRL interpretation. The policy gradient is an expectation under the current policy: \(\nabla J = \mathbb{E}_{\pi_k}[r(y,x,c) \nabla \log \pi_k(y|x)]\). When this expectation is estimated using samples from \(\pi_k\) (on-policy), the gradient estimator is unbiased. When samples come from a different distribution (the teacher, in offline mode), the estimator is biased. This bias can point the gradient in the wrong direction, especially when the student and teacher distributions have diverged.</p>
 <p>There is also a coverage argument. On-policy sampling ensures the student sees outputs it would actually generate. If the student has a particular failure mode (e.g., a systematic error in tool-use syntax), on-policy sampling will expose this failure mode and the teacher's distribution will provide corrective signal exactly where it is needed. Offline sampling from the teacher may never generate outputs that exhibit the student's specific failure modes, so those errors go uncorrected.</p>
 <p>The consistent ranking (on-policy SDFT > offline distillation > SFT from teacher) across all tasks provides strong evidence that both components contribute independently. The gap between offline distillation and SFT from teacher isolates the value of the soft distillation objective. The gap between on-policy SDFT and offline distillation isolates the value of on-policy sampling. In both cases, the gap is significant and consistent.</p>
 <p>This ablation also connects to the broader literature on on-policy versus off-policy methods in RL. On-policy methods (REINFORCE, PPO) are known to be more stable but less sample-efficient than off-policy methods (DQN, SAC). In the SDFT context, stability is more important than sample efficiency because the primary goal is continual learning without forgetting, which requires conservative, stable updates.</p>
@@ -2377,25 +2431,37 @@ def reasoning_experiment():
 <div class="equation-block">
     <div class="equation">\[ \mathcal{L}_{\text{SFT}} = -\mathbb{E}_{y \sim \pi(\cdot|x,c)}[\log \pi_\theta(y|x)] \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>L_SFT</code>: Standard supervised fine-tuning loss</li> <li><code>y ~ pi(.|x,c)</code>: Outputs sampled from teacher (fixed, pre-generated)</li> <li><code>log pi_theta(y|x)</code>: Student&#x27;s log-likelihood of teacher&#x27;s output</li> </ul></p>
+        <ul>
+            <li>\(\mathcal{L}_\text{SFT}\): Standard supervised fine-tuning loss</li>
+            <li>\(y \sim \pi(\cdot|x,c)\): Outputs sampled from teacher (fixed, pre-generated)</li>
+            <li>\(\log \pi_\theta(y|x)\): Student's log-likelihood of teacher's output</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \mathcal{L}_{\text{offline}} = D_{KL}(\pi_\theta(\cdot|x) \| \pi(\cdot|x,c)) \bigg|_{y \sim \pi(\cdot|x,c)} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>L_offline</code>: Offline distillation loss (KL on teacher-generated trajectories)</li> <li><code>y ~ pi(.|x,c)</code>: Trajectories from teacher, not student</li> </ul></p>
+        <ul>
+            <li>\(\mathcal{L}_\text{offline}\): Offline distillation loss (KL on teacher-generated trajectories)</li>
+            <li>\(y \sim \pi(\cdot|x,c)\): Trajectories from teacher, not student</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \mathcal{L}_{\text{SDFT}} = D_{KL}(\pi_\theta(\cdot|x) \| \pi(\cdot|x,c)) \bigg|_{y \sim \pi_\theta(\cdot|x)} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>L_SDFT</code>: On-policy SDFT loss (KL on student-generated trajectories)</li> <li><code>y ~ pi_theta(.|x)</code>: Trajectories from student (on-policy)</li> </ul></p>
+        <ul>
+            <li>\(\mathcal{L}_\text{SDFT}\): On-policy SDFT loss (KL on student-generated trajectories)</li>
+            <li>\(y \sim \pi_\theta(\cdot|x)\): Trajectories from student (on-policy)</li>
+        </ul>
     </div>
 </div>
 <div class="equation-block">
     <div class="equation">\[ \text{Performance ranking: } \mathcal{L}_{\text{SDFT}} > \mathcal{L}_{\text{offline}} > \mathcal{L}_{\text{SFT}} \]</div>
     <div class="equation-explanation">
-        <p><ul> <li><code>&gt;</code>: Produces better task performance and retention</li> </ul></p>
+        <ul>
+            <li>\(>\): Produces better task performance and retention</li>
+        </ul>
     </div>
 </div>
 
