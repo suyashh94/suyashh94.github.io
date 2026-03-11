@@ -1,5 +1,5 @@
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2406.11813'
   one_sentence_summary: This paper investigates how LLMs acquire factual knowledge
@@ -9,7 +9,7 @@
   paper_type: empirical
   title: How Do Large Language Models Acquire Factual Knowledge During Pretraining?
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2512.24880'
   one_sentence_summary: This paper introduces Manifold-Constrained Hyper-Connections
@@ -19,7 +19,7 @@
   paper_type: methodology
   title: 'mHC: Manifold-Constrained Hyper-Connections'
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2601.19897'
   one_sentence_summary: This paper introduces Self-Distillation Fine-Tuning (SDFT),
@@ -29,7 +29,7 @@
   paper_type: methodology
   title: Self-Distillation Enables Continual Learning
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2601.05242'
   one_sentence_summary: This paper identifies that GRPO's reward normalization collapses
@@ -38,7 +38,18 @@
   paper_type: methodology
   title: 'GDPO: Group reward-Decoupled Normalization Policy Optimization'
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
+  has_guide: true
+  id: '2505.12716'
+  one_sentence_summary: Shadow-FT proposes fine-tuning the BASE model instead of the
+    INSTRUCT model and grafting the learned weight updates onto INSTRUCT, exploiting
+    the observation that BASE and INSTRUCT weights differ by less than 3%, yielding
+    consistent improvements across 19 benchmarks with no extra parameters or training
+    cost.
+  paper_type: methodology
+  title: 'Shadow-FT: Tuning Instruct Model via Training on Paired Base Model'
+- authors: ''
+  date: '2026-03-11'
   has_guide: true
   id: '2509.04903'
   one_sentence_summary: This paper introduces ACE-RL, a reinforcement learning framework
@@ -48,7 +59,7 @@
   title: 'ACE-RL: Adaptive Constraint-Enhanced Reward for Long-form Generation Reinforcement
     Learning'
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2601.08763'
   one_sentence_summary: This paper introduces Uniqueness-Aware Reinforcement Learning,
@@ -59,7 +70,7 @@
   title: 'Rewarding the Rare: Uniqueness-Aware RL for Creative Problem Solving in
     LLMs'
 - authors: ''
-  date: '2026-02-12'
+  date: '2026-03-11'
   has_guide: true
   id: '2509.04259'
   one_sentence_summary: When fine-tuning foundation models, RL forgets less than SFT
