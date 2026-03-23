@@ -1,6 +1,6 @@
 ---
 title: "Fine-Tuning Retrieval Models: When It's the Right Call and How to Do It"
-date: 2026-03-23 10:00:00 +0530
+date: 2026-03-23
 categories: [Machine Learning, Information Retrieval]
 tags: [retrieval, embeddings, fine-tuning, lora, semantic-search, multimodal, clip, rag]
 description: "A practical guide to choosing your retrieval architecture — and where fine-tuned bi-encoders still win. Three experiments across text, multimodal, and composed retrieval."
