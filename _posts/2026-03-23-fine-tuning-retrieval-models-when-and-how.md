@@ -34,7 +34,7 @@ This post focuses on the cases where fine-tuning *is* the right call. We ran thr
 
 ![Three experiments, one conclusion: fine-tuning works](/assets/img/posts/khoji-retrieval/00_hero_results_summary.png)
 
-> For a deep dive into the full pipeline — model selection, LoRA mechanics, negative mining strategies, loss functions, and the complete Python API — see the companion post: [How to Fine-Tune Retrieval Models with khoji](/posts/how-to-fine-tune-retrieval-models-with-khoji/).
+> For a deep dive into the full pipeline — model selection, LoRA mechanics, negative mining strategies, loss functions, and the complete Python API — see the [khoji documentation and examples](https://github.com/suyashh94/khoji).
 {: .prompt-tip }
 
 ---
@@ -476,7 +476,7 @@ Full documentation, scripts, and notebooks at [github.com/suyashh94/khoji](https
 
 6. **If you have fewer than 500 labeled pairs, don't fine-tune yet.** Generate synthetic labels with an LLM, or use an embedding API's fine-tuning endpoint, and revisit when you have more data.
 
-7. **Want the full technical walkthrough?** Read [How to Fine-Tune Retrieval Models with khoji](/posts/how-to-fine-tune-retrieval-models-with-khoji/) for LoRA mechanics, negative mining deep dives, loss function selection, the complete Python API, and debugging tips.
+7. **Want the full technical walkthrough?** Check out the [khoji repo](https://github.com/suyashh94/khoji) for LoRA mechanics, negative mining deep dives, loss function selection, the complete Python API, and debugging tips.
 
 ---
 
