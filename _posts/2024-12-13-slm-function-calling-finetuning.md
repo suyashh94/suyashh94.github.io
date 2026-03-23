@@ -8,7 +8,6 @@ image:
   path: /assets/img/posts/slm-fc/slm_fc_cover.png
   alt: SLM Function Calling - Fine-tuning Small Models for Structured Output
 math: true
-pin: true
 ---
 
 In late 2024, I worked on a project for an automotive manufacturer involving natural language control of vehicle systems. The core requirement: convert spoken commands into structured function calls that could execute on edge hardware without network connectivity.

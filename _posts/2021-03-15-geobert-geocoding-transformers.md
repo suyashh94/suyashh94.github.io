@@ -9,7 +9,6 @@ image:
   alt: GeoBERT - Teaching Transformers to Understand Geography
 math: true
 mermaid: true
-pin: true
 ---
 
 ## The Problem At Hand

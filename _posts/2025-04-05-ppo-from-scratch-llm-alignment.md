@@ -9,7 +9,6 @@ image:
   alt: PPO from Scratch - Reinforcement Learning for Language Model Alignment
 math: true
 mermaid: true
-pin: true
 ---
 
 ## Why Build PPO from Scratch?

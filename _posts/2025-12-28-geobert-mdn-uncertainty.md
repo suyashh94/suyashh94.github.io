@@ -9,7 +9,6 @@ image:
   alt: GeoBERT MDN - Probabilistic Geocoding with Uncertainty Quantification
 math: true
 mermaid: true
-pin: true
 ---
 
 ## The Prediction Isn't Enough
