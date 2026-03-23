@@ -563,9 +563,6 @@ The adapter is 2-4MB. The base model is shared. You can serve multiple domain-sp
 
 For when you need to tune something specific. Every parameter khoji accepts, across all three modes.
 
-<details>
-<summary><strong>Click to expand full parameter reference</strong></summary>
-
 ### `model`
 
 | Parameter | Default | Description |
@@ -624,14 +621,15 @@ For when you need to tune something specific. Every parameter khoji accepts, acr
 | `run_before` | true | Baseline evaluation |
 | `run_after` | true | Post-training evaluation |
 
-</details>
-
 ---
 
 ## Getting Started
 
 ```bash
 pip install khoji
+
+# Generate example configs in a configs/ directory
+khoji init
 
 # Text → text
 khoji configs/minilm_scifact_full.yaml
@@ -644,6 +642,6 @@ python scripts/fashioniq/download_data.py
 python scripts/train_composed_retrieval_api.py
 ```
 
-Four configs are included: `minilm_scifact_full`, `minilm_scifact_overfit`, `clip_rsicd_full`, `clip_rsicd_overfit`. The `_full` configs run complete training + evaluation. The `_overfit` configs verify the pipeline works.
+`khoji init` generates four ready-to-use configs: `minilm_scifact_full`, `minilm_scifact_overfit`, `clip_rsicd_full`, and `clip_rsicd_overfit`. The `_full` configs run complete training + evaluation. The `_overfit` configs train on a single batch to verify the pipeline works end-to-end before committing to a full run.
 
 Full documentation, example scripts, and Jupyter notebooks at [github.com/suyashh94/khoji](https://github.com/suyashh94/khoji).
